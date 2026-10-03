@@ -1,0 +1,1574 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parsec">
+<meta name="theme-color" content="#08090b">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACfklEQVR42u3dPVLjMACA0Ziho6XjCJRpKHMCGk6THCA5DQ0nSEmjkiPQ0VKHIgUzgD2OLMuSeK/bnfVAvF+kWP7JagUAAAAAAHFOp5OdABjqgMaFEOwE4m0+Ps1kYGAHQzgADoEAKPS4Y7e1EwAAAKiek8AUocv5w+5eHkp4ze+Pr/7jx7iyC2qRf8FUHPUM8vuDOGp7Q7d75ZU4Jr+hu04cTflxqYorV8Tx7Xh7M/BHTCuIg+iPU4X8HgPrY8nXrHL+LCMH4kAcIA7EQSFxuNVCHP1HxtnPHGJaYQEVnFG0PmbkILHpp5rF0azpp5rFgTiYKQ4PqBNH/yFNu5dJYlpBHCQVOV8UcmNj1cpfVTNyIA4ucT4+FQe9x6fiwLSCOBAH4mDZj6Vxm7liauTeiFPIPjRyIA7EgTgQB+JAHKSU4QmI4qhVhicgpr9yuJC7F5OL++VnWh8LIazXayMHf8hQhjgQB+JAHIgDcSAO6tMNPF4h7ub6uGWf5EtMVV+QVsilZUYOxIE4EAfiQByIA3HQigq+HXJAzpWuQh6DlvMlGzkQB+JAHIgDcSAOxEErsi6ClX/hlmedGTkQR1VCCG3G4Uvgpstzb/QCcfgSuAacdlvTCj3v8P1BHPhAijiYcaKJ26zVb4f8hytdRg7EUc9RojjoPUoUB6YVxIE4QBwAAAAAAAAAAAAAAIzWvR2ffv/t/eZ55Pbnzcf/+5ZM3HXlc2sC4kAciANxUODRyqUaO1qxT4wciANxkNz1HJP0pQus0bP1spvP8cmmqNdu5MC0gjgQB+JgUWlWSDFyIA4QB+JAHIgDcSAOxIE4EAfiQBwgDsSBOBAH4kAc1OQLVB+m0FdqxEMAAAAASUVORK5CYII=">
+<title>Parsec Recompiled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    /* palette TMS9918A relevee sur des captures d'ecran d'epoque */
+    --ti-black:#000000;  --ti-mgreen:#1BC940; --ti-lgreen:#5EDC78;
+    --ti-dblue:#5354EE;  --ti-lblue:#7C70DA;  --ti-dred:#D5514C;
+    --ti-cyan:#40ECF5;   --ti-mred:#FC5554;   --ti-lred:#FF7A79;
+    --ti-dyellow:#D5C253;--ti-lyellow:#E5CE80;--ti-dgreen:#1BB238;
+    --ti-magenta:#CA5BBB;--ti-gray:#CDCDCD;   --ti-white:#FFFFFF;
+
+    --void:#08090b; --steel-hi:#c3c7cb; --steel:#9aa0a6; --steel-lo:#5e646a;
+    --plastic:#17181b; --plastic-lo:#0c0d0f; --seam:#2c2f34;
+    --card:#d8cdae; --card-ink:#1d1a12; --card-line:#b3a882;
+    --ink:#dfe3e8; --dim:#8b9199;
+    --pixel:"Silkscreen","Courier New",monospace;
+    --mono:"IBM Plex Mono",ui-monospace,"SF Mono",monospace;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    overscroll-behavior:none;              /* pas de rebond iOS pendant le jeu */
+    -webkit-text-size-adjust:100%;         /* iOS n'agrandit pas les textes */
+    background:
+      radial-gradient(120% 90% at 50% -20%, #1a1d22 0%, transparent 62%),
+      radial-gradient(80% 60% at 50% 120%, #101318 0%, transparent 70%),
+      var(--void);
+    color:var(--ink); font-family:var(--mono); -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:760px;margin:0 auto;
+    /* on respecte l'encoche et la barre d'accueil en mode plein ecran */
+    padding-inline:max(16px, env(safe-area-inset-left,0px)) max(16px, env(safe-area-inset-right,0px));
+    padding-block:calc(22px + env(safe-area-inset-top,0px)) calc(44px + env(safe-area-inset-bottom,0px));
+    display:flex;flex-direction:column;gap:18px;align-items:center;
+  }
+  .cart{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+  .cart .eyebrow{font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--dim);font-weight:500}
+  .cart h1{
+    margin:0;font-family:var(--pixel);font-weight:700;
+    font-size:clamp(30px,9vw,58px);letter-spacing:.06em;color:var(--ti-cyan);
+    text-shadow:0 0 18px rgba(64,236,245,.45), 0 3px 0 #0b5f66;
+  }
+  .cart .strap{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ti-lyellow)}
+
+  .console{
+    width:100%;max-width:640px;
+    background:linear-gradient(180deg,var(--steel-hi) 0%,var(--steel) 14%,var(--steel-lo) 100%);
+    border-radius:14px 14px 20px 20px;padding:12px 12px 10px;position:relative;
+    box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 -2px 0 rgba(0,0,0,.35) inset,0 30px 60px -28px rgba(0,0,0,.95);
+  }
+  .console::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 1px,rgba(0,0,0,.05) 1px 3px);
+    mix-blend-mode:overlay;
+  }
+  .bezel{
+    position:relative;background:linear-gradient(180deg,var(--plastic),var(--plastic-lo));
+    border:1px solid #000;border-radius:8px;padding:10px;
+    box-shadow:0 0 0 1px var(--seam),0 10px 24px -14px #000 inset;
+  }
+  .screen{
+    position:relative;background:#000;border-radius:4px;overflow:hidden;display:flex;justify-content:center;
+    box-shadow:0 0 0 2px #000,0 0 40px -8px rgba(64,236,245,.28) inset;
+  }
+  canvas{
+    display:block;width:100%;height:auto;max-width:100%;aspect-ratio:4/3;
+    image-rendering:pixelated;touch-action:none;background:#000;
+  }
+  .crt{
+    position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(180deg,rgba(0,0,0,.30) 0 1px,transparent 1px 3px);
+    box-shadow:inset 0 0 90px rgba(0,0,0,.9);mix-blend-mode:multiply;
+  }
+  .overlay{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:12px;text-align:center;padding:18px 20px;background:rgba(0,0,0,.86);
+  }
+  .overlay[hidden]{display:none!important}
+  .overlay h2{margin:0;font-family:var(--pixel);font-size:clamp(14px,3.6vw,22px);letter-spacing:.06em;color:var(--ti-lyellow);text-wrap:balance}
+  .overlay p{margin:0;max-width:44ch;font-size:12px;line-height:1.65;color:var(--ink)}
+  .overlay .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px;width:100%;max-width:400px}
+  .overlay .stat{border:1px solid #2a3138;background:#07090b;border-radius:3px;padding:7px 4px;display:flex;flex-direction:column;gap:5px}
+  .overlay .stat b{font-family:var(--pixel);font-size:13px;color:var(--ti-cyan);font-variant-numeric:tabular-nums}
+  .overlay .stat span{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .overlay .hint{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .go{
+    font-family:var(--pixel);font-size:12px;letter-spacing:.08em;color:#04110f;background:var(--ti-cyan);
+    border:0;border-radius:3px;padding:12px 22px;cursor:pointer;box-shadow:0 3px 0 #18848c;
+  }
+  .go:active{transform:translateY(2px);box-shadow:0 1px 0 #18848c}
+  .go:focus-visible{outline:2px solid var(--ti-lyellow);outline-offset:3px}
+
+  .plate{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;padding:0 4px}
+  .plate .badge{font-family:var(--pixel);font-size:8px;letter-spacing:.1em;color:#2b3036;text-shadow:0 1px 0 rgba(255,255,255,.45)}
+  .plate .toggles{display:flex;gap:6px}
+  .tg{
+    font-family:var(--mono);font-weight:600;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+    color:#f2f4f6;background:#24272b;border:1px solid #101214;border-top-color:#484d53;
+    border-radius:3px;padding:6px 9px;cursor:pointer;box-shadow:0 2px 0 #0b0c0e;
+  }
+  .tg[aria-pressed="true"]{background:var(--ti-mgreen);color:#04210c;border-top-color:#8bf0a6}
+  .tg:active{transform:translateY(1px);box-shadow:0 1px 0 #0b0c0e}
+  .tg:focus-visible{outline:2px solid var(--ti-cyan);outline-offset:2px}
+
+  .strip{
+    width:100%;max-width:640px;background:linear-gradient(180deg,#e2d8ba,var(--card));
+    color:var(--card-ink);border-radius:5px;padding:10px 12px 12px;border:1px solid var(--card-line);
+    box-shadow:0 14px 26px -18px rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.5) inset;
+  }
+  .strip .striphead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:1.5px solid var(--card-line);padding-bottom:6px;margin-bottom:9px}
+  .strip .striphead b{font-family:var(--pixel);font-size:11px;letter-spacing:.08em}
+  .strip .striphead span{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#6d6449}
+  .keys{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .key{
+    -webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;
+    background:#faf6ea;border:1.5px solid var(--card-line);border-radius:4px;padding:8px 2px 7px;
+    cursor:pointer;color:var(--card-ink);font-family:var(--mono);user-select:none;touch-action:none;
+  }
+  .key kbd{font-family:var(--pixel);font-size:11px;background:#23262a;color:#f4f6f8;border-radius:2px;padding:4px 6px;min-width:20px;text-align:center;box-shadow:0 2px 0 #0a0b0d}
+  .key em{font-style:normal;font-size:8px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+  .key.on{background:var(--ti-lyellow);border-color:#9a8c56}
+  .key:focus-visible{outline:2px solid #23262a;outline-offset:2px}
+
+  .brief{width:100%;max-width:640px;display:flex;flex-direction:column;gap:12px}
+  .brief h3{margin:0;font-family:var(--pixel);font-size:11px;letter-spacing:.1em;color:var(--ti-cyan)}
+  .brief > p{margin:0;font-size:12px;line-height:1.7;color:var(--dim);max-width:62ch}
+  .waves{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+  .waves li{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:baseline;padding:9px 2px;border-top:1px solid #1d2126}
+  .waves li:last-child{border-bottom:1px solid #1d2126}
+  .waves .n{font-family:var(--pixel);font-size:10px;color:var(--dim)}
+  .waves .name{font-weight:600;font-size:12px;letter-spacing:.04em}
+  .waves .desc{display:block;font-weight:400;font-size:11px;line-height:1.6;color:var(--dim);margin-top:3px}
+  .waves .pts{font-family:var(--pixel);font-size:10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tag{display:inline-block;font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.16em;
+       text-transform:uppercase;border:1px solid currentColor;border-radius:2px;padding:1px 4px;margin-left:6px;vertical-align:1px}
+  .fgt{color:var(--ti-lyellow)} .cru{color:var(--ti-cyan)}
+  .as{color:var(--ti-gray)} .tu{color:var(--ti-dyellow)}
+  .colophon{width:100%;max-width:640px;font-size:10px;line-height:1.7;color:#5f666e;border-top:1px solid #1d2126;padding-top:12px}
+  .colophon a{color:#7d858e}
+
+  /* sur telephone : le canvas doit tenir sans faire defiler la page pour jouer */
+  @media (max-width:560px){
+    canvas{ width:auto; height:auto; max-width:100%; max-height:46vh; max-height:46svh; }
+    .screen{ justify-content:center }
+  }
+  /* au doigt, les touches du cache clavier doivent etre plus hautes */
+  @media (pointer:coarse){
+    .key{ padding:14px 2px 13px }
+    .key kbd{ font-size:13px; padding:6px 10px; min-width:26px }
+    .key em{ font-size:9px }
+    .tg{ padding:9px 12px }
+  }
+  @media (max-width:520px){
+    .keys{grid-template-columns:repeat(3,1fr)}
+    .waves li{grid-template-columns:22px 1fr}
+    .waves .pts{grid-column:2;margin-top:2px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="cart">
+    <div class="eyebrow">Solid State Software &middot; Command Module</div>
+    <h1>PARSEC</h1>
+    <div class="strap">Lift 1 &middot; 6 vagues &middot; ceinture &middot; tunnel</div>
+  </header>
+
+  <main class="console">
+    <div class="bezel">
+      <div class="screen">
+        <canvas id="screen" width="768" height="576" aria-label="Aire de jeu Parsec, 256 sur 192 pixels"></canvas>
+        <div class="crt" aria-hidden="true"></div>
+        <div class="overlay" id="overlay">
+          <h2 id="ovTitle">PARSEC</h2>
+          <p id="ovText">Trois vagues de chasseurs alternent avec trois vagues de croiseurs, puis la ceinture d&rsquo;ast&eacute;ro&iuml;des et le tunnel de ravitaillement. Les chasseurs ne tirent pas&nbsp;: ils vous percutent. Les croiseurs, eux, tirent.</p>
+          <div class="stats" id="ovStats" hidden></div>
+          <button class="go" id="ovBtn" type="button">PRESS FIRE</button>
+          <div class="hint" id="ovHint">Espace = tir &middot; &uarr;&darr; altitude &middot; &larr;&rarr; lift 1-3</div>
+        </div>
+      </div>
+    </div>
+    <div class="plate">
+      <div class="badge">TI-99/4A &nbsp;&middot;&nbsp; PHM 3112</div>
+      <div class="toggles">
+        <button class="tg" id="tgSound" type="button" aria-pressed="true">Son</button>
+        <button class="tg" id="tgVoice" type="button" aria-pressed="true">Voix</button>
+        <button class="tg" id="tgPause" type="button" aria-pressed="false">Pause</button>
+      </div>
+    </div>
+  </main>
+
+  <section class="strip" aria-label="Cache clavier Parsec, sert aussi de commandes tactiles">
+    <div class="striphead"><b>PARSEC</b><span>Keyboard overlay</span></div>
+    <div class="keys">
+      <button class="key" data-act="lift" type="button"><kbd>&uarr;</kbd><em>Lift</em></button>
+      <button class="key" data-act="dive" type="button"><kbd>&darr;</kbd><em>Dive</em></button>
+      <button class="key" data-act="slow" type="button"><kbd>&larr;</kbd><em>Slow</em></button>
+      <button class="key" data-act="fast" type="button"><kbd>&rarr;</kbd><em>Fast</em></button>
+      <button class="key" data-act="fire" type="button"><kbd>FIRE</kbd><em>Blast</em></button>
+    </div>
+  </section>
+
+  <section class="brief">
+    <h3>ORDRE DE BATAILLE &mdash; RELEV&Eacute; SUR ENREGISTREMENT</h3>
+    <p>Cette s&eacute;quence n&rsquo;est pas devin&eacute;e&nbsp;: elle est mesur&eacute;e seconde par seconde sur un enregistrement de partie. Les messages du bord, d&eacute;coup&eacute;s en lettres noires dans la bande de sol, donnent les fronti&egrave;res exactes de chaque phase.</p>
+    <p>Le jeu n&rsquo;emploie que <strong>trois silhouettes d&rsquo;appareil</strong>, et non une par type&nbsp;: un petit chasseur, un gros fuselage partag&eacute; par les Urbites, Dramites, Bynites et LTF, et une soucoupe aplatie. Ce qui distingue un appareil d&rsquo;un autre, c&rsquo;est la <strong>couleur, tir&eacute;e au sort &agrave; chaque apparition</strong> &mdash; le m&ecirc;me fuselage passe du cyan au magenta, au rouge sombre ou au violet d&rsquo;une vague &agrave; l&rsquo;autre. Fiez-vous &agrave; la forme et &agrave; la taille, pas &agrave; la teinte.</p>
+    <p><strong>Les croiseurs changent d&rsquo;humeur.</strong> Les trois suivent le m&ecirc;me cycle&nbsp;: <span style="color:var(--ti-white)">blancs</span> &agrave; l&rsquo;arriv&eacute;e, ils passent au <span style="color:var(--ti-dblue)">bleu</span> au bout de deux secondes et acc&eacute;l&egrave;rent, puis au <span style="color:var(--ti-mred)">rouge</span> deux secondes plus tard&nbsp;: ils cessent alors de tirer et cherchent la collision. Un croiseur d&eacute;j&agrave; &eacute;nerv&eacute; qui sort par la gauche revient rouge &mdash; il ne se calme pas.</p>
+    <ol class="waves">
+      <li><span class="n">07s</span><span class="name fgt">ALIEN CRAFT ADVANCING!!!<span class="tag">Chasseurs</span><span class="desc">Les vagues de chasseurs ne sont jamais nomm&eacute;es &agrave; l&rsquo;&eacute;cran. Ils ne tirent pas&nbsp;: la menace est la collision.</span></span><span class="pts fgt">~15 s</span></li>
+      <li><span class="n">23s</span><span class="name cru">URBITE SHIPS ATTACKING!!!<span class="tag">Croiseurs</span><span class="desc">Trois appareils, annonc&eacute;s <em>un par un</em> &agrave; leur arriv&eacute;e. Ils tirent.</span></span><span class="pts cru">~21 s</span></li>
+      <li><span class="n">45s</span><span class="name fgt">ALIEN CRAFT ADVANCING!!!<span class="tag">Chasseurs</span><span class="desc">Deuxi&egrave;me vague de chasseurs.</span></span><span class="pts fgt">~17 s</span></li>
+      <li><span class="n">64s</span><span class="name cru">DRAMITE SHIPS ATTACKING!!!<span class="tag">Croiseurs</span><span class="desc">Deux appareils. Nomm&eacute;s d&rsquo;apr&egrave;s Jim Dramis.</span></span><span class="pts cru">~13 s</span></li>
+      <li><span class="n">77s</span><span class="name tu">REFUELING TUNNEL AHEAD<span class="desc"><strong>13 secondes de pr&eacute;avis</strong> avant que la bouche n&rsquo;arrive, puis FUEL STATION COMING UP, FUEL TANKS FULL&nbsp;!! et EXIT TUNNEL. Couloir mesur&eacute; &agrave; 22-27&nbsp;pixels.</span></span><span class="pts tu">~33 s</span></li>
+      <li><span class="n">111s</span><span class="name fgt">ALIEN CRAFT ADVANCING!!!<span class="tag">Chasseurs</span><span class="desc">Troisi&egrave;me vague, imm&eacute;diatement apr&egrave;s la sortie du tunnel.</span></span><span class="pts fgt">~19 s</span></li>
+      <li><span class="n">131s</span><span class="name cru">BYNITE SHIPS ATTACKING!!!<span class="tag">Croiseurs</span><span class="desc">Quatre appareils. Nomm&eacute;s d&rsquo;apr&egrave;s Don Bynum.</span></span><span class="pts cru">~19 s</span></li>
+      <li><span class="n">151s</span><span class="name as">CAUTION! ASTERIOD BELT!!<span class="desc">La faute de frappe est celle du jeu d&rsquo;origine. Le bord d&eacute;compte les secondes &agrave; voix haute&nbsp;; ensuite le sol change de couleur.</span></span><span class="pts as">~22 s</span></li>
+    </ol>
+    <p><strong style="color:var(--ti-mred)">Surchauffe&nbsp;:</strong> le canon chauffe &agrave; chaque tir et explose au rouge. <strong style="color:var(--ti-dyellow)">Carburant&nbsp;:</strong> il br&ucirc;le trois fois plus vite en LIFT 3. Vaisseau suppl&eacute;mentaire tous les 10&nbsp;000 points.</p>
+  </section>
+
+  <p class="colophon">
+    Remake d&rsquo;apr&egrave;s <em>Parsec</em> (Texas Instruments, 1982 &mdash; Jim Dramis &amp; Paul Urbanus). Sont relev&eacute;s au pixel sur des captures d&rsquo;&eacute;poque&nbsp;: le vaisseau joueur (16&times;10), le chasseur (14&times;8), le croiseur (16&times;13), la tour au sol (22&times;16), le rayon laser en pointill&eacute;, le nuage d&rsquo;explosion, la palette, la disposition du bandeau et le profil du tunnel. La police 5&times;7 et les bruitages reproduisent le g&eacute;n&eacute;rateur SN76489 du TI-99/4A (voies carr&eacute;es &agrave; diviseur 10 bits, bruit &agrave; registre &agrave; d&eacute;calage 15 bits). Jeu non affili&eacute; &agrave; Texas Instruments.
+  </p>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ==========================================================================
+   PARSEC — moteur
+   256x192 logiques, canvas en 3x. Bandeau d'etat sur les 24 lignes du bas,
+   a la place exacte de la cartouche de 1982.
+   ========================================================================== */
+var W = 256, H = 192, PH = 168, S = 3;
+
+var cv  = document.getElementById('screen');
+var ctx = cv.getContext('2d', { alpha:false });
+ctx.imageSmoothingEnabled = false;
+
+/* --- couleurs relevees sur captures d'epoque (TMS9918A) --- */
+var C = {
+  black:'#000000',  mgreen:'#1BC940', lgreen:'#5EDC78', dblue:'#5354EE',
+  lblue:'#7C70DA',  dred:'#D5514C',   cyan:'#40ECF5',   mred:'#FC5554',
+  lred:'#FF7A79',   dyellow:'#D5C253',lyellow:'#E5CE80',dgreen:'#1BB238',
+  magenta:'#CA5BBB',gray:'#CDCDCD',   white:'#FFFFFF'
+};
+/* les 16 teintes de sol des 16 lifts */
+var GROUND_COLORS = [C.dyellow, C.mgreen, C.cyan, C.magenta, C.lred, C.lblue];
+
+function px(x,y,w,h,col){
+  ctx.fillStyle = col;
+  ctx.fillRect(Math.round(x)*S, Math.round(y)*S, Math.round(w)*S, Math.round(h)*S);
+}
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function rnd(a,b){ return a + Math.random()*(b-a); }
+function irnd(a,b){ return Math.floor(rnd(a,b+1)); }
+function pad(n,len){ var s=String(Math.max(0,Math.floor(n))); while(s.length<len) s='0'+s; return s; }
+
+/* ==========================================================================
+   POLICE 5x7 sur pas de 8 px — celle du bandeau du TI-99/4A
+   ========================================================================== */
+var FONT = {};
+(function(){
+  var src = {
+    ' ':'00000,00000,00000,00000,00000,00000,00000',
+    'A':'01110,10001,10001,11111,10001,10001,10001',
+    'B':'11110,10001,10001,11110,10001,10001,11110',
+    'C':'01111,10000,10000,10000,10000,10000,01111',
+    'D':'11110,10001,10001,10001,10001,10001,11110',
+    'E':'11111,10000,10000,11110,10000,10000,11111',
+    'F':'11111,10000,10000,11110,10000,10000,10000',
+    'G':'11110,10000,10000,10111,10001,10001,01111',
+    'H':'10001,10001,10001,11111,10001,10001,10001',
+    'I':'01110,00100,00100,00100,00100,00100,01110',
+    'J':'00111,00010,00010,00010,00010,10010,01100',
+    'K':'10001,10010,10100,11000,10100,10010,10001',
+    'L':'10000,10000,10000,10000,10000,10000,11111',
+    'M':'10001,11011,10101,10101,10001,10001,10001',
+    'N':'10001,11001,11001,10101,10011,10011,10001',
+    'O':'11111,10001,10001,10001,10001,10001,11111',
+    'P':'11110,10001,10001,11110,10000,10000,10000',
+    'Q':'01110,10001,10001,10001,10101,10010,01101',
+    'R':'11110,10001,10001,11110,10100,10010,10001',
+    'S':'01111,10000,10000,01110,00001,00001,11110',
+    'T':'11111,00100,00100,00100,00100,00100,00100',
+    'U':'10001,10001,10001,10001,10001,10001,01110',
+    'V':'10001,10001,10001,10001,10001,01010,00100',
+    'W':'10001,10001,10001,10101,10101,11011,10001',
+    'X':'10001,10001,01010,00100,01010,10001,10001',
+    'Y':'10001,10001,01010,00100,00100,00100,00100',
+    'Z':'11111,00001,00010,00100,01000,10000,11111',
+    '0':'01110,10001,10001,10001,10001,10001,01110',
+    '1':'00100,01100,00100,00100,00100,00100,11111',
+    '2':'01110,10001,00001,00110,01000,10000,11111',
+    '3':'11111,00010,00100,00010,00001,10001,01110',
+    '4':'00010,00110,01010,10010,11111,00010,00010',
+    '5':'11111,10000,11110,00001,00001,10001,01110',
+    '6':'00110,01000,10000,11110,10001,10001,01110',
+    '7':'11111,00001,00010,00100,01000,01000,01000',
+    '8':'01110,10001,10001,01110,10001,10001,01110',
+    '9':'01110,10001,10001,01111,00001,00010,01100',
+    '!':'00100,00100,00100,00100,00100,00000,00100',
+    '.':'00000,00000,00000,00000,00000,01100,01100',
+    '-':'00000,00000,00000,11111,00000,00000,00000'
+  };
+  for(var k in src) FONT[k] = src[k].split(',');
+})();
+
+function tiText(s, x, y, col){
+  s = String(s).toUpperCase();
+  ctx.fillStyle = col;
+  for(var i=0;i<s.length;i++){
+    var gl = FONT[s.charAt(i)];
+    if(!gl) continue;
+    var gx = Math.round(x) + i*8;
+    for(var r=0;r<7;r++){
+      var row = gl[r];
+      for(var c=0;c<5;c++){
+        if(row.charAt(c) === '1') ctx.fillRect((gx+c)*S, (Math.round(y)+r)*S, S, S);
+      }
+    }
+  }
+}
+function textW(s){ return String(s).length*8 - 3; }
+function tiTextC(s, cx, y, col){ tiText(s, Math.round(cx - textW(s)/2), y, col); }
+
+/* ==========================================================================
+   SPRITES — releves au pixel sur des captures de 1982 pour le vaisseau
+   joueur et les Swoopers ; les autres appareils sont dessines dans le
+   meme style (contour creux, une seule couleur, comme les sprites du VDP).
+   ========================================================================== */
+function bitmap(rows){
+  var out = { w:rows[0].length, h:rows.length, pts:[] };
+  for(var y=0;y<rows.length;y++)
+    for(var x=0;x<rows[y].length;x++)
+      if(rows[y].charAt(x) === '#') out.pts.push(x, y);
+  return out;
+}
+var SPR = {
+  ship: bitmap([
+    '..#####.........',
+    '...#...#........',
+    '....#...#.......',
+    '############....',
+    '#.........###...',
+    '.#...####..###..',
+    '.##..#.......###',
+    '...##....#####..',
+    '..#.....#.......',
+    '########........'
+  ]),
+  /* les six types d'appareils partagent deux motifs, recolores par appareil :
+     chasseurs 14x8 (releve sur 4 exemplaires rouge, magenta, bleu clair, dore)
+     croiseurs 16x13 (releve sur l'adversaire de fin de vague) */
+  fighter: bitmap([
+    '........######',
+    '.......#....#.',
+    '......#.......',
+    '.....#..######',
+    '..######....#.',
+    '#######....#..',
+    '.....#....#...',
+    '....######....'
+  ]),
+  /* Deux familles seulement, relevees sur la video : un gros fuselage
+     ~15x12 partage par les Urbites, Dramites, Bynites et LTF (seule la
+     couleur change d'un appareil a l'autre), et une soucoupe aplatie
+     ~12x8. Mes triangles et raies precedents n'existaient pas.        */
+  /* Fuselage des croiseurs, releve cellule par cellule sur l'agrandissement
+     fourni : nez pointu a gauche sur les lignes centrales, deux lignes de
+     pont, profil en biseau vers l'arriere, derive verticale a droite.    */
+  /* Deuxieme vague : delta en fleche, releve cellule par cellule sur
+     l'agrandissement fourni (grille 14x9, cellule 5,9 x 6,0 px).      */
+  ltf: bitmap([
+    '..........####',
+    '........######',
+    '.......#####..',
+    '.....#######..',
+    '..##########..',
+    '###########...',
+    '......######..',
+    '........######',
+    '..........####'
+  ]),
+  big: bitmap([
+    '.........####..',
+    '.....####...#..',
+    '....###.....#..',
+    '...############',
+    '.###.......####',
+    '###############',
+    '##.#.#.#.#.####',
+    '.###.......####',
+    '...############',
+    '....###.....#..',
+    '.....####...#..',
+    '.........####..'
+  ]),
+  plasma: bitmap([
+    '..#.#...#..#..',
+    '.#.##.#..#....',
+    '#.#..#.##...#.',
+    '.##.#..#..#...',
+    '..#..##...#...',
+    '...#...#......'
+  ]),
+  /* Soucoupe relevee cellule par cellule sur l'agrandissement fourni
+     (grille 16x11, cellule 4,8 px) : coupole aplatie, rangee de hublots,
+     et des pattes qui pendent dessous.                                */
+  saucer: bitmap([
+    '....########....',
+    '..############..',
+    '.##############.',
+    '################',
+    '################',
+    '.##############.',
+    '..#.#.#.#.#.#...',
+    '....#...#..#....',
+    '....#...#..#....',
+    '.....#..#...#...',
+    '.....#...#......'
+  ]),
+  tower: bitmap([
+    '...################...',
+    '..##################..',
+    '.###............###...',
+    '######################',
+    '######################',
+    '######################',
+    '######################',
+    '.####################.',
+    '..##################..',
+    '...################...',
+    '.......#.#..#.#.......',
+    '.......#.#..#.#.......',
+    '.......#.#..#.#.......',
+    '.......#.#..#.#.......',
+    '.......#.#..#.#.......',
+    '.......#.#..#.#.......'
+  ]),
+  flattop: bitmap([
+    '##############',
+    '##############',
+    '.############.',
+    '.....####.....',
+    '......##......',
+    '......##......',
+    '......##......',
+    '......##......',
+    '......##......',
+    '......##......',
+    '....######....'
+  ]),
+  saucer2: bitmap([
+    '....######....',
+    '..##########..',
+    '.############.',
+    '..##########..',
+    '....#....#....',
+    '....#....#....',
+    '...##....##...'
+  ]),
+  shield: bitmap([
+    '..########..',
+    '.#........#.',
+    '##.#....#.##',
+    '##..#..#..##',
+    '##...##...##',
+    '##...##...##',
+    '##..#..#..##',
+    '##.#....#.##',
+    '.#........#.',
+    '..########..'
+  ]),
+  arch: bitmap([
+    '################',
+    '################',
+    '..############..',
+    '..##........##..',
+    '..##........##..',
+    '..##........##..',
+    '..##........##..',
+    '..##........##..'
+  ]),
+  craft: bitmap([
+    '..######..',
+    '.########.',
+    '##########',
+    '..##..##..',
+    '..#....#..'
+  ]),
+  fish: bitmap([
+    '...#####..#.',
+    '..########.#',
+    '.###########',
+    '..########.#',
+    '...#####..#.'
+  ]),
+  texas: bitmap([
+    '..####......###.',
+    '..####.........#',
+    '..#############.',
+    '..#############.',
+    '..#############.',
+    '.##############.',
+    '.##############.',
+    '.#############..',
+    '.############...',
+    '.###########....',
+    '..#########.....',
+    '..########......',
+    '...######.......',
+    '....####........',
+    '.....##.........',
+    '......#.........'
+  ]),
+  rock0: bitmap([
+    '..####..',
+    '.#....#.',
+    '#..##..#',
+    '#.#..#.#',
+    '#......#',
+    '.#....#.',
+    '..####..'
+  ]),
+  rock1: bitmap([
+    '..###...',
+    '.#...##.',
+    '#..#...#',
+    '#.....#.',
+    '.#..##.#',
+    '..#...#.',
+    '...###..'
+  ])
+};
+function drawSprite(sp, x, y, col){
+  ctx.fillStyle = col;
+  x = Math.round(x); y = Math.round(y);
+  var p = sp.pts;
+  for(var i=0;i<p.length;i+=2) ctx.fillRect((x+p[i])*S, (y+p[i+1])*S, S, S);
+}
+
+/* ==========================================================================
+   SON — reproduction du SN76489 : 3 voies carrees a diviseur 10 bits,
+   bruit par registre a decalage 15 bits, volume sur 4 bits (pas de 2 dB).
+   ========================================================================== */
+var AC = window.AudioContext || window.webkitAudioContext;
+var actx=null, master=null, engOsc=null, engGain=null, engLfo=null, engLfoGain=null;
+var soundOn=true, voiceOn=true, noiseBufs={};
+var CLK = 3579545/16;                       /* 223721 Hz : l'horloge du PSG */
+
+function tiTone(hz){                        /* frequences quantifiees par le diviseur */
+  var n = clamp(Math.round(CLK/(2*hz)), 1, 1023);
+  return CLK/(2*n);
+}
+function atten(a){ return a >= 15 ? 0 : Math.pow(10, -2*a/20); }  /* attenuation 4 bits */
+
+function lfsrBuffer(shiftHz, white){
+  var key = shiftHz+'|'+white;
+  if(noiseBufs[key]) return noiseBufs[key];
+  var sr = actx.sampleRate, n = Math.floor(sr*1.2);
+  var buf = actx.createBuffer(1, n, sr), d = buf.getChannelData(0);
+  var reg = 0x8000, step = sr/shiftHz, acc = 0, out = 0;
+  for(var i=0;i<n;i++){
+    acc += 1;
+    if(acc >= step){
+      acc -= step;
+      if(white){ var bit = (reg ^ (reg>>1)) & 1; reg = (reg>>>1) | (bit<<14); }
+      else     { reg = (reg>>>1) | ((reg&1)<<14); }
+      out = reg & 1;
+    }
+    d[i] = out ? 0.85 : -0.85;
+  }
+  noiseBufs[key] = buf;
+  return buf;
+}
+
+function audioBoot(){
+  if(actx || !AC) return;
+  try{
+    actx = new AC();
+    if(actx.state === 'suspended' && actx.resume) actx.resume();
+    master = actx.createGain(); master.gain.value = 0.30; master.connect(actx.destination);
+    engOsc = actx.createOscillator(); engOsc.type='square'; engOsc.frequency.value = tiTone(230);
+    engGain = actx.createGain(); engGain.gain.value = 0;
+    engLfo = actx.createOscillator(); engLfo.type='square'; engLfo.frequency.value = 13;
+    engLfoGain = actx.createGain(); engLfoGain.gain.value = 7;
+    engLfo.connect(engLfoGain); engLfoGain.connect(engOsc.frequency);
+    engOsc.connect(engGain); engGain.connect(master);
+    engOsc.start(); engLfo.start();
+  }catch(e){ actx = null; }
+}
+/* Le vaisseau n'a PAS de bruit de moteur. Mesure par autocorrelation sur
+   l'enregistrement : les plages sans evenement (4-6,5 s avant la premiere
+   vague, 86-88 s, 104-106 s dans le tunnel) sont strictement silencieuses.
+   Cette fonction ne sert plus qu'a reveiller le contexte audio.          */
+function engine(on, speedIdx){
+  if(!actx) return;
+  if(actx.state === 'suspended' && actx.resume) actx.resume();
+  engGain.gain.setTargetAtTime(0, actx.currentTime, 0.05);
+}
+
+
+/* balayage de frequence par paliers : le programme reecrit le diviseur */
+function psgSweep(f0, f1, dur, steps, att0, att1, delay){
+  if(!actx || !soundOn) return;
+  var t = actx.currentTime + (delay||0);
+  var o = actx.createOscillator(), g = actx.createGain();
+  o.type = 'square';
+  for(var i=0;i<steps;i++){
+    var k = i/(steps-1||1), tt = t + dur*i/steps;
+    o.frequency.setValueAtTime(tiTone(f0*Math.pow(f1/f0, k)), tt);
+    g.gain.setValueAtTime(atten(att0 + (att1-att0)*k), tt);
+  }
+  g.gain.setValueAtTime(0, t+dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t+dur+0.02);
+}
+function psgNoise(shiftHz, white, dur, steps, att0, att1, delay){
+  if(!actx || !soundOn) return;
+  var t = actx.currentTime + (delay||0);
+  var src = actx.createBufferSource(); src.buffer = lfsrBuffer(shiftHz, white); src.loop = true;
+  var g = actx.createGain();
+  for(var i=0;i<steps;i++){
+    var k = i/(steps-1||1);
+    g.gain.setValueAtTime(atten(att0 + (att1-att0)*k), t + dur*i/steps);
+  }
+  g.gain.setValueAtTime(0, t+dur);
+  src.connect(g); g.connect(master); src.start(t); src.stop(t+dur+0.02);
+}
+function psgTone(hz, dur, att, delay){
+  if(!actx || !soundOn) return;
+  var t = actx.currentTime + (delay||0);
+  var o = actx.createOscillator(), g = actx.createGain();
+  o.type='square'; o.frequency.setValueAtTime(tiTone(hz), t);
+  g.gain.setValueAtTime(atten(att), t); g.gain.setValueAtTime(0, t+dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t+dur+0.02);
+}
+var SFX = {
+  /* releve 19-21 s : 596->441->334->286->220 Hz en ~0,12 s, tire en rafale */
+  laser:   function(){ psgSweep(600, 220, 0.12, 6, 3, 11); },
+  boom:    function(){
+    psgNoise(1748, true, 0.9, 16, 1, 15);
+    for(var i=0;i<6;i++) psgSweep(430, 150, 0.14, 7, 3+i*2, 8+i*2, i*0.14);
+  },
+  /* releve a 50,0 s : 440->215 Hz en ~0,12 s, repete 4 fois en s'attenuant */
+  ehit:    function(){
+    for(var i=0;i<4;i++) psgSweep(445, 215, 0.115, 7, 4+i*2, 9+i*2, i*0.125);
+    psgNoise(6991, true, 0.10, 4, 8, 15);
+  },
+  rock:    function(){ psgNoise(3496, true, 0.3, 9, 2, 15); },
+  ping:    function(){ psgNoise(6991, false, 0.07, 3, 6, 13); },
+  eshot:   function(){ psgSweep(215, 500, 0.10, 7, 6, 12); },
+  refuel:  function(){ psgTone(880, 0.05, 6); psgTone(1320, 0.05, 6, 0.05); },
+  alert:   function(){ for(var i=0;i<4;i++){ psgTone(i%2?440:660, 0.12, 4, i*0.14); } },
+  /* sirene d'arrivee des chasseurs : deux tons alternes releves a 7,8 s */
+  sirenF:  function(){
+    var f=[394,469,490,156,212,469,630,689,387,469,156,212,469,630,469,387], d=0;
+    for(var i=0;i<f.length;i++){ psgTone(f[i], 0.028, 4, d); d+=0.030; }
+  },
+  /* sirene d'arrivee des croiseurs : descente puis alternance, relevee a 22,8 s */
+  sirenC:  function(){
+    var f=[452,322,258,452,409,495,279,215,172], d=0;
+    for(var i=0;i<f.length;i++){ psgTone(f[i], 0.030, 4, d); d+=0.032; }
+    psgTone(538, 0.18, 5, 0.30); psgTone(495, 0.12, 6, 0.48);
+  },
+  /* la soucoupe bourdonne comme une mouche : bruit periodique grave,
+     deux bouffees courtes a la suite                                */
+  buzz:    function(){
+    psgNoise(1748, false, 0.12, 3, 7, 11, 0);
+    psgNoise(1748, false, 0.12, 3, 7, 11, 0.17);
+  },
+  /* appareil qui entre : glissando lent 218 -> 193 Hz sur ~0,55 s (releve 10,8-11,4 s) */
+  enter:   function(){ psgSweep(218, 192, 0.55, 12, 6, 11); },
+  bonus:   function(){ var f=[523,659,784,1046,1319,1568]; for(var i=0;i<6;i++) psgTone(f[i],0.09,4,i*0.07); },
+  clear:   function(){ var f=[392,523,659,784]; for(var i=0;i<4;i++) psgTone(f[i],0.11,4,i*0.09); },
+  tick:    function(){ psgTone(1046, 0.05, 7); },
+  lift:    function(n){ psgTone(200+n*140, 0.06, 8); }
+};
+
+/* --- voix de bord : la signature de Parsec --- */
+var synth = window.speechSynthesis || null;
+function say(line){
+  if(!voiceOn || !synth) return;
+  try{
+    synth.cancel();
+    var u = new SpeechSynthesisUtterance(line);
+    u.rate = 0.9; u.pitch = 0.5; u.volume = 0.95; u.lang = 'en-US';
+    synth.speak(u);
+  }catch(e){}
+}
+
+/* ==========================================================================
+   ETAT
+   ========================================================================== */
+var FLOOR = PH - 44;        /* plus bas qu'ici, les appareils entrent dans les pics */
+var SPEEDS = [44, 82, 128];        /* px/s — LIFT 1, 2, 3 */
+var BURN   = [0.50, 0.85, 1.45];   /* carburant/s : un plein tient ~2 min en LIFT 2 */
+
+var G = {
+  mode:'attract', t:0, score:0, hi:0, lives:4, fuel:100, heat:0, speed:1,
+  lift:1, nextExtra:10000, shots:0, hits:0, kills:0,
+  phase:-1, cur:null, phaseT:0, spawned:0, killed:0, waiting:0, nextSpawn:0, countdown:99,
+  msg:null, lowFuel:false, invuln:0, deathT:0, shake:0, fireCd:0, reason:'',
+  groundCol:C.dyellow, signX:-999, refuelT:0, tankFull:false
+};
+
+var ship  = { x:60, y:70, vy:0, w:16, h:10 };
+var bolts = [], ebolts = [], foes = [], parts = [], stars = [];
+
+var ground  = new Int16Array(W+1);
+var roofBot = new Int16Array(W+1);
+var roofTop = new Int16Array(W+1);
+var scrollAcc = 0, worldX = 0;
+
+/* ==========================================================================
+   RELIEF — bande doree a arete en dents de scie, plus les silhouettes
+   du sol (montagnes, domes, tours, vegetation) comme sur la cartouche.
+   ========================================================================== */
+var gen = {
+  base:PH-13, target:PH-13, seg:0, jit:1, jit2:1, mode:'land',
+  spikeW:0, spikeH:0, gap:3, cool:40, tun:0, tunDir:0,
+  terr:'spikes', modeLeft:60, moundW:0, moundI:0, moundH:12
+};
+var decors = [];   /* silhouettes posees sur le sol, relevees sur la video */
+var DECOR = [
+  { spr:'tower',   solid:10 }, { spr:'flattop', solid:3 },
+  { spr:'saucer2', solid:4 },  { spr:'shield',  solid:10 },
+  { spr:'arch',    solid:8 },  { spr:'craft',   solid:5 },
+  { spr:'fish',    solid:5 },  { spr:'tower',   solid:10 }
+];
+function spawnDecor(base){
+  var r = Math.random(), d;
+  if(r < 0.07)      d = { spr:'texas', solid:16 };          /* le Texas dans le paysage */
+  else if(r < 0.14) d = { word:'PARSEC', solid:7 };         /* le titre ecrit dans le sol */
+  else { var k = DECOR[irnd(0,DECOR.length-1)]; d = { spr:k.spr, solid:k.solid }; }
+  var w = d.word ? textW(d.word) : SPR[d.spr].w;
+  var h = d.word ? 7 : SPR[d.spr].h;
+  d.x = W+2; d.y = base - h; d.w = w; d.h = h;
+  decors.push(d);
+}
+
+function genColumn(){
+  /* arete hachee : marche aleatoire serree, comme la ligne d'horizon d'origine */
+  gen.jit  = clamp(gen.jit  + irnd(-1,1), 0, 4);
+  gen.jit2 = clamp(gen.jit2 + irnd(-1,1), 0, 3);
+
+  if(gen.mode === 'tunnel' || gen.tun > 0){
+    var p = gen.tun;                       /* 0 -> 1 : la dalle s'epaissit en coin */
+    ground[W] = PH - 15 - gen.jit;
+    if(p <= 0.03){ roofTop[W] = -40; roofBot[W] = -40; }
+    else {
+      roofTop[W] = 118;
+      roofBot[W] = 118 + Math.round(p*6) + Math.round(p*gen.jit2);
+    }
+    if(gen.tunDir > 0) gen.tun = Math.min(1, gen.tun + 0.012);
+    else if(gen.tunDir < 0){
+      gen.tun = Math.max(0, gen.tun - 0.012);
+      if(gen.tun === 0){ gen.mode='land'; gen.base = PH-16; gen.target = PH-16; gen.seg = 30; }
+    }
+    return;
+  }
+
+  /* Distribution relevee sur l'enregistrement (hauteur du relief au-dessus
+     du bas de l'aire de jeu) : mediane 19 px, quartiles 10 et 33, p95 a 61,
+     8,6 % des colonnes au-dessus de 45. La bande de base doit donc respirer
+     entre 8 et 40 px, et non rester plate a 11-15.                       */
+  if(gen.seg <= 0){
+    gen.seg = irnd(30, 90);
+    gen.target = clamp(gen.base + irnd(-3,3), PH-15, PH-11);
+  }
+  gen.seg--;
+  gen.base += clamp(gen.target - gen.base, -0.3, 0.3);
+
+  /* le sol alterne des buttes arrondies et des forets de pics fins */
+  if(--gen.modeLeft <= 0){
+    gen.terr = ['spikes','mounds','spikes','mounds','flat'][irnd(0,4)];
+    gen.modeLeft = irnd(40, 130);
+    gen.moundW = 0;
+  }
+  var h;
+  if(gen.terr === 'mounds'){
+    if(gen.moundW <= 0){
+      gen.moundW = irnd(14,30); gen.moundI = 0; gen.moundH = irnd(7,22);
+      if(Math.random() < 0.25) gen.moundH = 0;      /* creux entre deux buttes */
+    }
+    h = gen.moundH ? Math.round(gen.moundH*Math.sin(Math.PI*gen.moundI/(gen.moundW-1))) : irnd(0,2);
+    gen.moundI++; if(gen.moundI >= gen.moundW) gen.moundW = 0;
+  } else if(gen.terr === 'flat'){
+    h = irnd(0,2);
+  } else {
+    if(gen.spikeW > 0){ h = gen.spikeH; gen.spikeW--; }
+    else {
+      h = irnd(0,3);
+      if(--gen.gap <= 0){ gen.spikeW = irnd(1,2); gen.spikeH = irnd(5,30); gen.gap = irnd(1,5); }
+    }
+  }
+  ground[W]  = clamp(Math.round(gen.base) - h, 20, PH-4);
+  roofTop[W] = -40; roofBot[W] = -40;
+  if(--gen.cool <= 0){ spawnDecor(Math.round(gen.base)); gen.cool = irnd(70, 190); }
+}
+function shiftWorld(){
+  ground.copyWithin(0,1); roofBot.copyWithin(0,1); roofTop.copyWithin(0,1);
+  genColumn();
+  for(var k=decors.length-1;k>=0;k--){ if(--decors[k].x < -decors[k].w-2) decors.splice(k,1); }
+  worldX++;
+  if(G.signX > -999) G.signX--;
+}
+function resetTerrain(){
+  gen.mode='land'; gen.base=PH-13; gen.target=PH-13; gen.seg=0; gen.jit=1; gen.jit2=1;
+  gen.spikeW=0; gen.gap=3; gen.cool=40; gen.tun=0; gen.tunDir=0;
+  gen.terr='spikes'; gen.modeLeft=60; gen.moundW=0;
+  decors.length = 0;
+  for(var i=0;i<=W;i++){
+    genColumn();
+    ground[i]=ground[W]; roofTop[i]=roofTop[W]; roofBot[i]=roofBot[W];
+    for(var k=0;k<decors.length;k++) decors[k].x--;
+  }
+  for(k=decors.length-1;k>=0;k--) if(decors[k].x < -decors[k].w-2) decors.splice(k,1);
+}
+/* seule la partie haute est solide : on passe entre les pieds des tours */
+function hitsDecor(x,y,w,h){
+  for(var i=0;i<decors.length;i++){
+    var d = decors[i];
+    if(x < d.x+d.w && x+w > d.x && y < d.y+d.solid && y+h > d.y) return true;
+  }
+  return false;
+}
+function groundAt(x){ return ground[clamp(Math.round(x),0,W)]; }
+function roofAt(x){ return roofBot[clamp(Math.round(x),0,W)]; }
+function roofTopAt(x){ return roofTop[clamp(Math.round(x),0,W)]; }
+/* vrai seulement si la boite [y,y+h] mord dans la dalle */
+function hitsRoof(x, y, h){
+  var rb = roofAt(x);
+  return rb > -20 && y <= rb && y + h >= roofTopAt(x);
+}
+/* vrai seulement si l'appareil est sous la dalle, dans le couloir */
+function underRoof(x, y){
+  var rb = roofAt(x);
+  return rb > -20 && y >= rb;
+}
+
+/* ==========================================================================
+   VAGUES — 3 chasseurs / 3 croiseurs en alternance, puis ceinture et tunnel
+   ========================================================================== */
+/* Chronologie relevee seconde par seconde sur l'enregistrement fourni :
+   7s chasseurs, 23s Urbites, 45s chasseurs, 64s Dramites, 77s tunnel,
+   111s chasseurs, 131s Bynites, 151s ceinture. Les vagues de chasseurs ne
+   sont pas nommees a l'ecran ; chaque croiseur est annonce a son arrivee. */
+var ALIEN = 'ALIEN CRAFT ADVANCING!!!';
+var PHASES = [
+  { kind:'wave', key:'swooper', name:ALIEN, count:5, cruiser:false, voice:'Alert, alien craft advancing.' },
+  { kind:'wave', key:'urbite',  name:'URBITE SHIPS ATTACKING!!!',  count:3, cruiser:true, voice:'Alert, ships attacking.' },
+  { kind:'wave', key:'ltf',     name:ALIEN, count:5, cruiser:false, voice:'Alert, alien craft advancing.' },
+  { kind:'wave', key:'dramite', name:'DRAMITE SHIPS ATTACKING!!!', count:2, cruiser:true, voice:'Alert, ships attacking.' },
+  { kind:'tunnel', name:'REFUELING TUNNEL AHEAD', dur:30, voice:'Refueling tunnel ahead.' },
+  { kind:'wave', key:'saucer',  name:ALIEN, count:5, cruiser:false, voice:'Alert, alien craft advancing.' },
+  { kind:'wave', key:'bynite',  name:'BYNITE SHIPS ATTACKING!!!',  count:4, cruiser:true, voice:'Alert, ships attacking.' },
+  { kind:'belt', name:'CAUTION! ASTERIOD BELT!!', dur:22, voice:'Caution: asteroid belt.' }
+];
+var queue = [];   /* file des phases : une station peut s'y intercaler */
+var TUNNEL = null;
+var POINTS = { swooper:100, urbite:150, ltf:200, dramite:250, saucer:300, bynite:350, rock:50 };
+/* la couleur est tiree au sort appareil par appareil : trois teintes
+   differentes coexistent a l'ecran sur les captures d'epoque */
+var FOE_COLORS = [C.dred, C.magenta, C.lblue, C.dyellow, C.cyan, C.lred, C.lgreen, C.lyellow, C.white];
+var CRUISERS = { urbite:1, dramite:1, bynite:1 };
+function foeSprite(kind){
+  if(kind === 'rock') return null;
+  if(kind === 'swooper') return SPR.fighter;   /* petit chasseur 14x8 */
+  if(kind === 'saucer')  return SPR.saucer;    /* soucoupe aplatie 12x8 */
+  if(kind === 'ltf')     return SPR.ltf;       /* delta en fleche 14x9 */
+  return SPR.big;                              /* Urbite, Dramite, Bynite */
+}
+
+function message(text, dur){ G.msg = { text:text, t:0, dur:dur||2.4 }; }
+
+/* ==========================================================================
+   ENTITES
+   ========================================================================== */
+function spawnFoe(kind){
+  var sp = foeSprite(kind) || SPR.rock0;
+  var f = { kind:kind, x:W+4, t:0, fire:rnd(0.8,1.8), seed:Math.random()*99,
+            w:sp.w, h:sp.h, col:FOE_COLORS[irnd(0,FOE_COLORS.length-1)], wraps:0 };
+  if(kind === 'swooper'){ f.vx=-78; f.base=rnd(14, PH*0.48); f.y=f.base; }
+  else if(kind === 'urbite'){ f.vx=-46; f.y=rnd(12, PH*0.42); f.step=0.5; }
+  else if(kind === 'ltf'){ f.vx=-126; f.y=rnd(12, PH-60); }
+  else if(kind === 'dramite'){ f.vx=-72; f.y=rnd(14, PH*0.45); }
+  else if(kind === 'saucer'){
+    /* la soucoupe entre par la GAUCHE, avance, fait demi-tour et ressort,
+       puis revient : elle ne traverse jamais l'ecran comme les autres. */
+    f.vx = 62; f.base = rnd(16, PH-64); f.y = f.base;
+    f.x = -20; f.turn = rnd(1.8, 3.0); f.dir = 1; f.buzz = rnd(0, 0.5);
+  }
+  else if(kind === 'bynite'){ f.vx=-52; f.y=rnd(12, PH*0.5); }
+  else { /* asteroide */
+    f.kind='rock'; f.spr = Math.random()<0.5 ? 'rock0' : 'rock1';
+    var s2 = SPR[f.spr]; f.w=s2.w; f.h=s2.h;
+    f.vx=-rnd(66,124); f.vy=rnd(-20,20); f.y=rnd(6, PH-30);
+    f.col=FOE_COLORS[irnd(0,FOE_COLORS.length-1)];   /* la ceinture est bariolee */
+  }
+  /* place APRES la chaine else-if : glissee dedans, elle detournait
+     tous les chasseurs vers la branche asteroide.                  */
+  if(CRUISERS[f.kind]){ f.col = C.white; f.rage = 0; f.k = 1; }
+  foes.push(f);
+  return f;
+}
+/* L'explosion d'origine lance 16 fragments sur des vecteurs fixes : quatre
+   aux points cardinaux, quatre en diagonale a 3, huit en positions
+   intermediaires a 4/1. Chaque fragment etait un sprite entier, d'ou le
+   nuage de points que montrent les captures.                           */
+var EXPLODE_V = [[-4,0],[0,0],[4,0],[0,4],[-3,-3],[3,-3],[3,3],[-3,3],
+                 [-4,-1],[-1,-4],[1,-4],[4,-1],[4,1],[1,4],[-1,4],[-4,1]];
+function boom(x,y,n,r){
+  var sc = (r || 10) * 0.9;
+  var per = clamp(Math.round((n||48)/16), 1, 6);
+  for(var i=0;i<EXPLODE_V.length;i++){
+    var v = EXPLODE_V[i];
+    for(var j=0;j<per;j++){
+      parts.push({ x:x+rnd(-1.5,1.5), y:y+rnd(-1.5,1.5),
+                   vx:v[0]*sc + rnd(-3,3), vy:v[1]*sc + rnd(-3,3),
+                   life:rnd(0.4,1.0), col:C.white });
+    }
+  }
+}
+
+function fire(){
+  if(G.mode !== 'play' || G.fireCd > 0 || bolts.length >= 4) return;
+  G.fireCd = 0.14;
+  bolts.push({ x:ship.x+16, y:ship.y+5, vx:340 });
+  G.heat = clamp(G.heat + 11, 0, 120);
+  G.shots++;
+  SFX.laser();
+}
+
+/* ==========================================================================
+   ENTREES
+   ========================================================================== */
+var keys = { lift:false, dive:false, fire:false };
+function setLift(i){
+  i = clamp(i,0,2);
+  if(i !== G.speed){ G.speed = i; engine(true, G.speed); SFX.lift(i); }
+}
+function onKey(e, down){
+  var k = e.key, used = true;
+  if(k==='ArrowUp'||k==='w'||k==='W'||k==='e'||k==='E') keys.lift = down;
+  else if(k==='ArrowDown'||k==='s'||k==='S'||k==='x'||k==='X') keys.dive = down;
+  else if(k==='ArrowLeft'||k==='a'||k==='A'){ if(down) setLift(G.speed-1); }
+  else if(k==='ArrowRight'||k==='d'||k==='D'){ if(down) setLift(G.speed+1); }
+  else if(k==='1'||k==='2'||k==='3'){ if(down) setLift(parseInt(k,10)-1); }
+  else if(k===' '||k==='Enter'){ keys.fire = down; if(down) primary(); }
+  else if((k==='p'||k==='P') && down) togglePause();
+  else if((k==='m'||k==='M') && down) toggleSound();
+  else used = false;
+  if(used) e.preventDefault();
+}
+window.addEventListener('keydown', function(e){ if(!e.repeat) audioBoot(); onKey(e,true); }, {passive:false});
+window.addEventListener('keyup',   function(e){ onKey(e,false); }, {passive:false});
+
+Array.prototype.forEach.call(document.querySelectorAll('.key'), function(btn){
+  var act = btn.getAttribute('data-act');
+  function on(ev){
+    ev.preventDefault(); audioBoot(); btn.classList.add('on');
+    if(act==='lift') keys.lift=true;
+    else if(act==='dive') keys.dive=true;
+    else if(act==='slow') setLift(G.speed-1);
+    else if(act==='fast') setLift(G.speed+1);
+    else if(act==='fire'){ keys.fire=true; primary(); }
+  }
+  function off(ev){
+    if(ev) ev.preventDefault();
+    btn.classList.remove('on');
+    if(act==='lift') keys.lift=false;
+    else if(act==='dive') keys.dive=false;
+    else if(act==='fire') keys.fire=false;
+  }
+  btn.addEventListener('pointerdown', on);
+  btn.addEventListener('pointerup', off);
+  btn.addEventListener('pointercancel', off);
+  btn.addEventListener('pointerleave', off);
+});
+
+var drag = null;
+cv.addEventListener('pointerdown', function(e){
+  audioBoot();
+  if(G.mode !== 'play'){ primary(); return; }
+  cv.setPointerCapture(e.pointerId);
+  drag = { y:e.clientY, shipY:ship.y, moved:false };
+});
+cv.addEventListener('pointermove', function(e){
+  if(!drag) return;
+  var r = cv.getBoundingClientRect(), k = H / r.height;
+  var dy = (e.clientY - drag.y) * k;
+  if(Math.abs(dy) > 2) drag.moved = true;
+  ship.y = clamp(drag.shipY + dy, 1, PH - ship.h - 1);
+  ship.vy = 0;
+});
+cv.addEventListener('pointerup', function(){
+  if(drag && !drag.moved && G.mode==='play') fire();
+  drag = null;
+});
+
+/* ==========================================================================
+   INTERFACE HORS ECRAN
+   ========================================================================== */
+var ov=document.getElementById('overlay'), ovTitle=document.getElementById('ovTitle'),
+    ovText=document.getElementById('ovText'), ovStats=document.getElementById('ovStats'),
+    ovBtn=document.getElementById('ovBtn'), ovHint=document.getElementById('ovHint');
+
+function showOverlay(title, text, stats, btn, hint){
+  ovTitle.textContent = title;
+  ovText.innerHTML = text;
+  if(stats && stats.length){
+    ovStats.innerHTML = stats.map(function(s){
+      return '<div class="stat"><b>'+s[1]+'</b><span>'+s[0]+'</span></div>';
+    }).join('');
+    ovStats.hidden = false;
+  } else ovStats.hidden = true;
+  ovBtn.textContent = btn; ovHint.textContent = hint; ov.hidden = false;
+}
+function loadHi(){ try{ return parseInt(localStorage.getItem('parsec.hi')||'0',10)||0; }catch(e){ return 0; } }
+function saveHi(v){ try{ localStorage.setItem('parsec.hi', String(v)); }catch(e){} }
+
+var paused = false;
+function togglePause(){
+  if(G.mode !== 'play' && G.mode !== 'dying') return;
+  paused = !paused;
+  document.getElementById('tgPause').setAttribute('aria-pressed', paused?'true':'false');
+  engine(!paused, G.speed);
+  if(paused && synth) try{ synth.cancel(); }catch(e){}
+}
+function toggleSound(){
+  soundOn = !soundOn;
+  document.getElementById('tgSound').setAttribute('aria-pressed', soundOn?'true':'false');
+  engine(soundOn && G.mode==='play' && !paused, G.speed);
+}
+document.getElementById('tgSound').addEventListener('click', function(){ audioBoot(); toggleSound(); });
+document.getElementById('tgVoice').addEventListener('click', function(e){
+  voiceOn = !voiceOn;
+  e.currentTarget.setAttribute('aria-pressed', voiceOn?'true':'false');
+  if(!voiceOn && synth){ try{ synth.cancel(); }catch(err){} } else say('Voice on.');
+});
+document.getElementById('tgPause').addEventListener('click', togglePause);
+ovBtn.addEventListener('click', function(){ audioBoot(); primary(); });
+
+function primary(){ audioBoot(); if(G.mode === 'play'){ fire(); return; } startGame(); }
+
+/* ==========================================================================
+   CYCLE DE PARTIE
+   ========================================================================== */
+function startGame(){
+  G.mode='play'; G.t=0; G.score=0; G.lives=4; G.fuel=100; G.heat=0; G.speed=1; G.lift=1;
+  G.nextExtra=10000; G.shots=0; G.hits=0; G.kills=0;
+  G.phase=-1; G.phaseT=0; G.spawned=0; G.killed=0; G.waiting=0; G.nextSpawn=0;
+  queue = PHASES.slice();
+  TUNNEL = PHASES[PHASES.length-1];
+  G.cur = null;
+  G.msg=null; G.lowFuel=false; G.invuln=2; G.deathT=0; G.shake=0; G.fireCd=0;
+  G.groundCol=GROUND_COLORS[0]; G.signX=-999; G.refuelT=0; G.countdown=99; G.tankFull=false;
+  paused=false; document.getElementById('tgPause').setAttribute('aria-pressed','false');
+  bolts.length=0; ebolts.length=0; foes.length=0; parts.length=0;
+  ship.x=60; ship.y=64; ship.vy=0;
+  resetTerrain(); makeStars();
+  ov.hidden = true;
+  engine(true, G.speed);
+  say('Press fire to begin.');
+  nextPhase();
+}
+function makeStars(){
+  stars.length = 0;
+  var pal = [C.white,C.white,C.white,C.white,C.gray,C.lred,C.cyan,C.magenta,C.dblue,C.mgreen,C.lyellow];
+  for(var i=0;i<52;i++) stars.push({ x:rnd(0,W), y:rnd(0,PH-24), z:rnd(0.25,1), c:pal[irnd(0,pal.length-1)] });
+}
+function nextPhase(){
+  G.phase++; G.phaseT=0; G.spawned=0; G.killed=0; G.nextSpawn=0.6; G.waiting=0; G.countdown=99;
+  var P = queue.shift();
+  G.cur = P;
+  if(!P){ levelClear(); return; }
+  message(P.name, 2.6);
+  say(P.voice);
+  if(P.kind === 'tunnel'){ message(P.name, 13); G.tankFull = false; }
+  if(P.kind === 'belt') SFX.alert();
+  if(P.kind === 'wave'){ if(P.cruiser) SFX.sirenC(); else SFX.sirenF(); }
+}
+function levelClear(){
+  G.mode='clear'; engine(false,0);
+  var fuelBonus = Math.floor(G.fuel)*10, shipBonus = (G.lives-1)*500;
+  G.score += fuelBonus + shipBonus;
+  if(G.score > G.hi){ G.hi = G.score; saveHi(G.hi); }
+  var acc = G.shots ? Math.round(100*G.hits/G.shots) : 0;
+  SFX.bonus(); say('Advance to next level.');
+  showOverlay('LIFT 1 TERMINE',
+    'Les six vagues sont abattues, la ceinture franchie et le r&eacute;servoir refait. Sur la cartouche, le sol change de couleur et les Swoopers repartent, plus vite.',
+    [['Score', pad(G.score,6)], ['Bonus fuel', '+'+fuelBonus], ['Vaisseaux', '+'+shipBonus], ['Pr&eacute;cision', acc+'%']],
+    'REJOUER', 'Espace pour relancer');
+}
+function gameOver(reason){
+  G.mode='over'; engine(false,0);
+  if(G.score > G.hi){ G.hi = G.score; saveHi(G.hi); }
+  var acc = G.shots ? Math.round(100*G.hits/G.shots) : 0;
+  var P = G.cur || PHASES[0];
+  say('Game over.');
+  showOverlay('GAME OVER',
+    'Perdu en phase <strong>'+P.name+'</strong>&nbsp;: '+reason+'.',
+    [['Score', pad(G.score,6)], ['Top', pad(G.hi,6)], ['Abattus', String(G.kills)], ['Pr&eacute;cision', acc+'%']],
+    'PRESS FIRE', 'Espace pour relancer');
+}
+function die(reason, voice){
+  if(G.mode !== 'play' || G.invuln > 0) return;
+  G.mode='dying'; G.deathT=1.7; G.shake=1; G.reason=reason;
+  boom(ship.x+8, ship.y+5, 150, 19);
+  SFX.boom(); engine(false,0);
+  message(reason, 1.7);
+  say(voice || 'You got me.');
+}
+function respawn(){
+  G.lives--;
+  if(G.lives <= 0){ gameOver(G.reason || 'vaisseau d&eacute;truit'); return; }
+  ship.y = clamp(groundAt(ship.x) - 54, 8, PH-40); ship.vy=0;
+  G.heat=0; G.fuel=Math.max(G.fuel, 32); G.invuln=2.6; G.mode='play'; G.fireCd=0;
+  for(var i=foes.length-1;i>=0;i--) if(foes[i].x < 140) foes.splice(i,1);
+  ebolts.length=0;
+  engine(true, G.speed);
+}
+function addScore(n){
+  G.score += n;
+  if(G.score >= G.nextExtra){
+    G.nextExtra += 10000; G.lives++;
+    message('EXTRA SHIP', 2);
+    SFX.bonus(); say('Extra ship.');
+  }
+}
+
+/* ==========================================================================
+   MISE A JOUR
+   ========================================================================== */
+function update(dt){
+  G.t += dt;
+  if(G.shake > 0) G.shake = Math.max(0, G.shake - dt*1.6);
+  if(G.msg){ G.msg.t += dt; if(G.msg.t > G.msg.dur) G.msg = null; }
+
+  var sp = SPEEDS[G.speed];
+  if(G.mode === 'dying') sp *= 0.4;
+  scrollAcc += sp*dt;
+  var guard = 0;
+  while(scrollAcc >= 1 && guard++ < 40){ shiftWorld(); scrollAcc -= 1; }
+
+  for(var i=0;i<stars.length;i++){
+    var st = stars[i];
+    st.x -= sp*st.z*0.3*dt;
+    if(st.x < 0){ st.x = W; st.y = rnd(0, PH-24); }
+  }
+  for(i=parts.length-1;i>=0;i--){
+    var p = parts[i];
+    p.life -= dt; if(p.life <= 0){ parts.splice(i,1); continue; }
+    p.x += p.vx*dt; p.y += p.vy*dt; p.vx -= sp*0.35*dt;
+  }
+
+  if(G.mode === 'dying'){ G.deathT -= dt; if(G.deathT <= 0) respawn(); return; }
+  if(G.mode !== 'play') return;
+
+  if(G.invuln > 0) G.invuln -= dt;
+  G.fireCd -= dt;
+  if(keys.fire) fire();
+
+  /* --- surchauffe du canon : pas de jauge sur la cartouche, un avertissement --- */
+  G.heat = Math.max(0, G.heat - 26*dt);
+  if(G.heat >= 100){ die('LASER OVERHEAT', 'Laser overheated.'); return; }
+  if(G.heat > 55 && (!G.msg || G.msg.dur < 0.5)) message('LASER OVERHEAT', 0.35);
+
+  /* --- pilotage --- */
+  var acc = (keys.lift?-1:0) + (keys.dive?1:0);
+  if(!drag){
+    ship.vy += acc*520*dt;
+    if(acc === 0) ship.vy *= Math.pow(0.0009, dt);
+    ship.vy = clamp(ship.vy, -88, 88);
+    ship.y += ship.vy*dt;
+  }
+  if(ship.y < 1){ ship.y = 1; ship.vy = 0; }
+  if(ship.y > PH - ship.h - 1){ ship.y = PH - ship.h - 1; ship.vy = 0; }
+
+  /* --- carburant --- */
+  var inTunnel = underRoof(ship.x+8, ship.y);
+  if(inTunnel && G.speed === 0){
+    G.fuel = Math.min(100, G.fuel + 22*dt);
+    G.refuelT += dt;
+    if(G.refuelT > 0.16){ G.refuelT = 0; SFX.refuel(); }
+    if(G.fuel >= 100 && !G.tankFull){
+      G.tankFull = true; message('FUEL TANKS FULL !!', 4); SFX.bonus();
+    }
+  } else {
+    G.fuel -= BURN[G.speed]*dt;
+    if(inTunnel && (!G.msg || G.msg.dur < 0.5)) message('SLOW DOWN', 0.4);
+  }
+  if(G.fuel < 25 && !G.lowFuel){ G.lowFuel = true; say('Warning: time to refuel.'); SFX.alert(); }
+  if(G.fuel > 45) G.lowFuel = false;
+  if(G.fuel <= 0){ G.fuel = 0; die('OUT OF FUEL', 'Sorry, you are out of fuel.'); return; }
+
+  /* --- relief --- */
+  if(hitsDecor(ship.x+2, ship.y+2, ship.w-4, ship.h-4)){ die('CRASH', 'You crashed.'); return; }
+  for(var cx = ship.x+1; cx <= ship.x + ship.w - 1; cx += 2){
+    if(ship.y + ship.h >= groundAt(cx)){ die('CRASH', 'You crashed.'); return; }
+    if(hitsRoof(cx, ship.y, ship.h)){ die('CRASH', 'You crashed.'); return; }
+  }
+
+  /* --- tirs joueur --- */
+  for(i=bolts.length-1;i>=0;i--){
+    var b = bolts[i];
+    b.x += b.vx*dt;
+    if(b.x > W+6 || b.y >= groundAt(b.x) || hitsRoof(b.x, b.y, 1)){
+      bolts.splice(i,1); continue;
+    }
+    for(var j=foes.length-1;j>=0;j--){
+      var f = foes[j];
+      if(b.x+11 < f.x || b.x > f.x+f.w || b.y+1 < f.y || b.y > f.y+f.h) continue;
+      addScore(POINTS[f.kind] || 50); G.hits++; G.kills++; G.killed++;
+      if(f.kind !== 'rock' && Math.random() < 0.28){
+        say(['Good shot.','Laser on target.','Enemy destroyed.','Nice shooting.','Great shot, pilot.'][irnd(0,4)]);
+      }
+      boom(f.x+f.w/2, f.y+f.h/2, f.kind==='rock'?34:60, f.kind==='rock'?8:12);
+      if(f.kind === 'rock') SFX.rock(); else SFX.ehit();
+      foes.splice(j,1); bolts.splice(i,1);
+      break;
+    }
+  }
+  /* --- tirs ennemis --- */
+  for(i=ebolts.length-1;i>=0;i--){
+    var e = ebolts[i];
+    e.x += e.vx*dt;
+    if(e.x < -6 || e.y >= groundAt(e.x)){ ebolts.splice(i,1); continue; }
+    var ew = (e.kind === 'ball') ? 14 : (e.kind === 'bar' ? 14 : 11);
+    var eh = (e.kind === 'ball') ? 6 : 1;
+    if(G.invuln <= 0 && e.x < ship.x+ship.w-2 && e.x+ew > ship.x+2 && e.y+eh > ship.y+2 && e.y < ship.y+ship.h-2){
+      ebolts.splice(i,1); die('SHIP HIT', 'You got me.'); return;
+    }
+  }
+
+  /* --- appareils ennemis --- */
+  for(i=foes.length-1;i>=0;i--){
+    var o = foes[i];
+    o.t += dt;
+    /* Cycle commun aux trois croiseurs : blancs a l'arrivee, bleus et plus
+       rapides apres 2 s, rouges et fonceurs 2 s plus tard. En rouge ils
+       cessent de tirer et cherchent la collision.                        */
+    if(CRUISERS[o.kind]){
+      if(o.t < 2)      { o.col = C.white; o.rage = 0; o.k = 1;   }
+      else if(o.t < 4) { o.col = C.dblue; o.rage = 1; o.k = 1.7; }
+      else             { o.col = C.mred;  o.rage = 2; o.k = 2.4; }
+    }
+    if(o.kind === 'swooper'){
+      o.x += o.vx*dt;
+      if(o.t > 0.45) o.y = o.base + 56*Math.sin((o.t-0.45)*2.1);
+      o.y = clamp(o.y, 2, FLOOR);
+    } else if(o.kind === 'urbite'){
+      o.x += o.vx*dt*o.k;
+      o.step -= dt;
+      if(o.step <= 0){ o.step = rnd(0.5,0.9); o.to = o.y + (ship.y > o.y ? 1 : -1)*rnd(10,18); }
+      if(o.to !== undefined) o.y += clamp(o.to - o.y, -80*dt, 80*dt);
+      o.y = clamp(o.y, 2, FLOOR);
+      o.fire -= dt;
+      if(o.fire <= 0 && o.x < W-10 && o.rage < 2){   /* Urbite : un trait central */
+        o.fire = rnd(1.2,2.2);
+        ebolts.push({x:o.x-4, y:o.y+6, vx:-190, col:C.dred, kind:'dot'});
+        SFX.eshot();
+      }
+    } else if(o.kind === 'ltf'){
+      o.x += o.vx*dt*(o.x > 180 ? 1 : 0.62);
+      if(o.x < 200) o.y += clamp(ship.y - o.y, -96*dt, 96*dt);
+      o.y = clamp(o.y, 2, FLOOR);
+    } else if(o.kind === 'dramite'){
+      /* croiseur : plane en larges paliers vers votre altitude et tire a plat.
+         Il rasait le relief, ce qui le rendait injouable dans la foret de pics. */
+      o.x += o.vx*dt*o.k*(o.x > 190 ? 1 : 0.72);
+      if(o.tgt === undefined || o.t > o.next){
+        o.next = o.t + rnd(1.0,2.0);
+        o.tgt = clamp(ship.y + rnd(-24,24), 6, FLOOR-14);
+      }
+      o.y += clamp(o.tgt - o.y, -58*dt, 58*dt);
+      o.y = clamp(o.y, 2, FLOOR-14);
+      o.fire -= dt;
+      if(o.fire <= 0 && o.x < W-10 && o.rage < 2){   /* Dramite : deux barres */
+        o.fire = rnd(1.4,2.4);
+        ebolts.push({x:o.x-4, y:o.y+4,  vx:-210, col:C.gray, kind:'bar'});
+        ebolts.push({x:o.x-4, y:o.y+8,  vx:-210, col:C.gray, kind:'bar'});
+        SFX.eshot();
+      }
+    } else if(o.kind === 'saucer'){
+      o.x += o.vx*dt;
+      o.turn -= dt;
+      if(o.turn <= 0 && o.dir > 0){ o.dir = -1; o.vx = -Math.abs(o.vx); }
+      o.y = clamp(o.base, 2, FLOOR);        /* trajectoire rectiligne */
+      o.buzz -= dt;
+      if(o.buzz <= 0 && o.x > -12 && o.x < W){ o.buzz = rnd(0.75,1.05); SFX.buzz(); }
+    } else if(o.kind === 'bynite'){
+      o.x += o.vx*dt*o.k;
+      o.y += clamp((ship.y-2) - o.y, -42*dt, 42*dt);
+      o.y = clamp(o.y, 2, FLOOR);
+      o.fire -= dt;
+      if(o.fire <= 0 && o.x < W-10 && o.rage < 2){   /* Bynite : une nuee */
+        o.fire = rnd(0.9,1.8);
+        ebolts.push({x:o.x-14, y:o.y+3, vx:-150, col:C.lyellow, kind:'ball'});
+        SFX.eshot();
+      }
+    } else {
+      o.x += o.vx*dt; o.y += o.vy*dt;
+      if(o.y < 2 || o.y > FLOOR) o.vy *= -1;
+      o.y = clamp(o.y, 2, FLOOR);
+    }
+
+    if(o.rage === 2){                       /* mode enerve : cap sur le vaisseau */
+      o.y += clamp((ship.y + ship.h/2 - o.h/2) - o.y, -130*dt, 130*dt);
+      o.y = clamp(o.y, 2, FLOOR);
+    }
+    /* sortie par la gauche : l'appareil revient par la droite et recharge */
+    if(o.x < -o.w){
+      if(o.kind === 'rock'){ foes.splice(i,1); continue; }
+      if(o.kind === 'saucer'){            /* la soucoupe repasse par la gauche */
+        o.x = -o.w - irnd(0,16); o.vx = Math.abs(o.vx);
+        o.dir = 1; o.turn = rnd(1.8, 3.0); o.base = rnd(16, PH-64); o.buzz = rnd(0,0.4);
+      } else {
+        o.x = W + irnd(0,22);
+      }
+      o.wraps++;
+      if(!CRUISERS[o.kind]) o.t = 0;        /* le croiseur garde sa colere */
+      if(o.kind === 'swooper' || o.kind === 'saucer') o.base = rnd(12, PH*0.5);
+      else o.y = rnd(10, PH*0.5);
+    }
+    if(G.invuln <= 0 && G.mode === 'play' &&
+       o.x < ship.x+ship.w-2 && o.x+o.w > ship.x+2 &&
+       o.y < ship.y+ship.h-2 && o.y+o.h > ship.y+2){
+      boom(o.x+o.w/2, o.y+o.h/2, 60, 12);
+      foes.splice(i,1);
+      die(o.kind === 'rock' ? 'ASTEROID HIT' : 'COLLISION', 'You got me.');
+      return;
+    }
+  }
+  updatePhase(dt);
+}
+
+function updatePhase(dt){
+  var P = G.cur;
+  if(!P) return;
+  G.phaseT += dt;
+  if(G.waiting > 0){ G.waiting -= dt; if(G.waiting <= 0) nextPhase(); return; }
+
+  if(P.kind === 'wave'){
+    var alive = foes.length;
+    var ready = P.cruiser ? (alive === 0) : (alive < 3);
+    if(G.spawned < P.count && ready && G.phaseT >= G.nextSpawn){
+      spawnFoe(P.key); G.spawned++;
+      SFX.enter();
+      if(P.cruiser && G.spawned > 1){ message(P.name, 2.6); say(P.voice); SFX.sirenC(); }
+      G.nextSpawn = G.phaseT + (P.cruiser ? 1.6 : rnd(1.4,2.4));
+    }
+    if(G.spawned >= P.count && foes.length === 0){
+      message('WAVE CLEARED', 1.5); SFX.clear(); G.waiting = 1.8;
+      /* comme sur la cartouche : la station arrive quand le plein baisse */
+      if(G.fuel < 52 && TUNNEL && queue.length && queue[0].kind !== 'tunnel') queue.unshift(TUNNEL);
+    }
+  } else if(P.kind === 'belt'){
+    if(G.phaseT < P.dur && G.phaseT >= G.nextSpawn){
+      spawnFoe('rock'); G.nextSpawn = G.phaseT + rnd(0.3,0.8);
+    }
+    /* decompte parle : sur la cartouche c'est la seule indication de duree */
+    /* le decompte parle va de cinq a un, precede de son annonce */
+    var left = Math.ceil(P.dur - G.phaseT);
+    if(left === 6 && left !== G.countdown){ G.countdown = left; say('Countdown.'); SFX.tick(); }
+    else if(left <= 5 && left >= 1 && left !== G.countdown){
+      G.countdown = left; say(['one','two','three','four','five'][left-1]+'..'); SFX.tick();
+    }
+    if(G.phaseT >= P.dur){
+      for(var i=foes.length-1;i>=0;i--){
+        boom(foes[i].x+4, foes[i].y+4, 24, 8);
+        foes.splice(i,1);
+      }
+      /* apres la ceinture, le sol change de teinte : c'est la marque du lift suivant */
+      G.groundCol = GROUND_COLORS[(GROUND_COLORS.indexOf(G.groundCol)+1) % GROUND_COLORS.length];
+      message('BELT CLEARED', 1.5); SFX.clear(); G.waiting = 1.7;
+      if(G.fuel < 52 && TUNNEL && queue.length && queue[0].kind !== 'tunnel') queue.unshift(TUNNEL);
+    }
+  } else if(P.kind === 'tunnel'){
+    /* 13 s de preavis, puis la bouche arrive : c'est ce temps de reaction
+       qui manquait, bien plus que la largeur du couloir.                */
+    if(G.phaseT > 12.5 && gen.mode !== 'tunnel' && gen.tun === 0){
+      gen.mode='tunnel'; gen.tunDir=1; G.signX = W + 52;
+      message('FUEL STATION COMING UP', 7); say('Fuel station coming up.');
+    }
+    if(G.phaseT > P.dur - 9 && gen.tunDir > 0){
+      gen.tunDir = -1; message('EXIT TUNNEL', 6); say('Exit tunnel.');
+    }
+    if(G.phaseT > P.dur + 3) nextPhase();
+  }
+}
+
+/* ==========================================================================
+   RENDU
+   ========================================================================== */
+var EXHAUST = [[-5,5],[-3,5],[-11,6],[-8,6],[-6,6],[-2,6],[-10,7],[-9,7],[-7,7],[-4,7],[-5,8],[-3,8]];
+
+function drawShip(){
+  if(G.mode === 'dying') return;
+  if(G.invuln > 0 && Math.floor(G.t*14)%2 === 0) return;
+  var x = Math.round(ship.x), y = Math.round(ship.y);
+  var reach = 4 + G.speed*4;
+  ctx.fillStyle = C.white;
+  for(var i=0;i<EXHAUST.length;i++){
+    var e = EXHAUST[i];
+    if(-e[0] > reach) continue;
+    if(Math.random() < 0.22) continue;
+    ctx.fillRect((x+e[0])*S, (y+e[1])*S, S, S);
+  }
+  drawSprite(SPR.ship, x, y, C.dgreen);
+}
+function drawTerrain(){
+  var col = G.groundCol, x, gy, rt, rb;
+  ctx.fillStyle = col;
+  for(x=0;x<W;x++){
+    gy = ground[x];
+    ctx.fillRect(x*S, gy*S, S, (PH-gy)*S);
+    rb = roofBot[x];
+    if(rb > -20){
+      rt = Math.max(0, roofTop[x]);
+      if(rb >= rt) ctx.fillRect(x*S, rt*S, S, (rb-rt+1)*S);
+    }
+  }
+}
+function drawSign(){
+  if(G.signX <= -44 || G.signX >= W) return;
+  var y = roofAt(clamp(G.signX+16,0,W));
+  if(y < -20) y = 128;
+  y += 4;
+  tiText('FUEL', G.signX, y, G.groundCol);
+  px(G.signX-2, y+8, 33, 1, G.groundCol);
+}
+function drawHUD(){
+  px(0, PH, W, H-PH, C.black);
+
+  tiText('FUEL', 24, 169, C.cyan);
+  px(62,168,86,1,C.gray); px(62,176,86,1,C.gray);
+  px(62,169,1,7,C.gray);  px(147,169,1,7,C.gray);
+  var fw = Math.round(84*clamp(G.fuel,0,100)/100);
+  if(fw > 0) px(63,169,fw,7, (G.fuel < 25 && Math.floor(G.t*6)%2===0) ? C.lred : C.dred);
+
+  var alen = 10 + G.speed*9;                      /* fleche de vitesse */
+  px(163,172,alen,1,C.cyan);
+  px(163,170,1,5,C.cyan);
+  for(var k=1;k<=3;k++){ px(163+alen-k,172-k,1,1,C.cyan); px(163+alen-k,172+k,1,1,C.cyan); }
+
+  tiText(pad(G.score,6), 196, 169, C.white);
+
+  var n = Math.min(Math.max(G.lives-1,0), 4);
+  for(var i=0;i<n;i++) drawSprite(SPR.ship, 23+i*16, 181, C.cyan);
+  tiText('LIFT '+(G.speed+1), 96, 183, C.cyan);
+  tiText('TOP', 160, 183, C.cyan);
+  tiText(pad(G.hi,6), 196, 183, C.white);
+}
+function render(){
+  ctx.fillStyle = C.black;
+  ctx.fillRect(0,0,cv.width,cv.height);
+
+  ctx.save();
+  if(G.shake > 0) ctx.translate(Math.round(rnd(-2,2)*G.shake)*S, Math.round(rnd(-2,2)*G.shake)*S);
+
+  for(var i=0;i<stars.length;i++){
+    var st = stars[i];
+    ctx.fillStyle = st.c;
+    ctx.fillRect(Math.round(st.x)*S, Math.round(st.y)*S, S, S);
+  }
+  drawTerrain();
+  for(i=0;i<decors.length;i++){
+    var dd = decors[i];
+    if(dd.word) tiText(dd.word, dd.x, dd.y, G.groundCol);
+    else drawSprite(SPR[dd.spr], dd.x, dd.y, G.groundCol);
+  }
+  drawSign();
+
+  for(i=0;i<foes.length;i++){
+    var f = foes[i];
+    drawSprite(f.kind === 'rock' ? SPR[f.spr] : foeSprite(f.kind), f.x, f.y, f.col);
+  }
+  ctx.fillStyle = C.lred;                       /* le rayon est pointille sur l'original */
+  for(i=0;i<bolts.length;i++){
+    var bx = Math.round(bolts[i].x), by = Math.round(bolts[i].y)*S;
+    for(var d=0; d<12; d+=2) ctx.fillRect((bx+d)*S, by, S, S);
+  }
+  for(i=0;i<ebolts.length;i++){
+    var eb = ebolts[i], ex = Math.round(eb.x), ey = Math.round(eb.y);
+    ctx.fillStyle = eb.col || C.dred;
+    if(eb.kind === 'ball'){                 /* Bynite : nuee de points */
+      drawSprite(SPR.plasma, ex, ey, eb.col || C.lyellow);
+    } else if(eb.kind === 'bar'){           /* Dramite : barre pleine */
+      ctx.fillRect(ex*S, ey*S, 14*S, S);
+    } else {                                /* Urbite : trait pointille */
+      for(var q=0;q<12;q+=2) ctx.fillRect((ex+q)*S, ey*S, S, S);
+    }
+  }
+  drawShip();
+  for(i=0;i<parts.length;i++){
+    var p = parts[i];
+    ctx.fillStyle = p.col;
+    ctx.fillRect(Math.round(p.x)*S, Math.round(p.y)*S, S, S);
+  }
+
+  /* ligne de message : lettres noires decoupees dans la bande de sol */
+  if(G.msg) tiTextC(G.msg.text, W/2, PH-10, C.black);
+  if(!voiceOn && G.mode==='play' && G.cur && G.cur.kind==='belt'){
+    var left = Math.ceil(G.cur.dur - G.phaseT);
+    if(left >= 1 && left <= 5) tiText(pad(left,2), W-24, PH-10, C.black);
+  }
+  ctx.restore();
+
+  drawHUD();
+
+  if(paused){
+    px(0,0,W,PH,'rgba(0,0,0,0.72)');
+    tiTextC('PAUSE', W/2, PH/2-10, C.cyan);
+    tiTextC('P POUR REPRENDRE', W/2, PH/2+4, C.gray);
+  }
+}
+
+/* ==========================================================================
+   BOUCLE
+   ========================================================================== */
+var last = 0;
+function frame(ts){
+  requestAnimationFrame(frame);
+  if(!last) last = ts;
+  var dt = (ts - last)/1000; last = ts;
+  if(dt > 0.05) dt = 0.05;
+  if(!paused && (G.mode === 'play' || G.mode === 'dying')) update(dt);
+  else if(G.mode === 'attract') attract(dt);
+  render();
+}
+function attract(dt){
+  G.t += dt;
+  scrollAcc += 44*dt;
+  var guard = 0;
+  while(scrollAcc >= 1 && guard++ < 20){ shiftWorld(); scrollAcc -= 1; }
+  for(var i=0;i<stars.length;i++){
+    var st = stars[i];
+    st.x -= 44*st.z*0.3*dt;
+    if(st.x < 0){ st.x = W; st.y = rnd(0, PH-24); }
+  }
+  ship.y = 62 + Math.sin(G.t*1.2)*20;
+}
+
+function boot(state){
+  G.hi = Math.max(loadHi(), (state && state.hi) || 0);
+  G.mode = 'attract'; G.groundCol = GROUND_COLORS[0];
+  resetTerrain(); makeStars();
+  requestAnimationFrame(frame);
+}
+if(window.claude && window.claude.hot && window.claude.hot.snapshot){
+  window.claude.hot.snapshot(function(){ return { hi:G.hi }; });
+}
+if(window.claude && window.claude.hot && window.claude.hot.ready){
+  window.claude.hot.ready(boot);
+} else {
+  boot((window.claude && window.claude.hot && window.claude.hot.data) || {});
+}
+})();
+</script>

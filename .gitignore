@@ -1,0 +1,14 @@
+# Sources d'origine Texas Instruments (1982) — propriétaires, ne pas rediffuser
+parsec.asm
+parsec.gpl
+
+# Enregistrement vidéo d'un tiers, utilisé seulement comme référence de travail
+*.mp4
+
+# Autre jeu du dossier, hors périmètre de ce dépôt
+neon-vaus.html
+
+# Fichier de travail : la version servie est index.html
+parsec.html
+
+.DS_Store
