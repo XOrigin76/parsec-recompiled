@@ -617,6 +617,27 @@ function drawSprite(sp, x, y, col){
    bruit par registre a decalage 15 bits, volume sur 4 bits (pas de 2 dB).
    ========================================================================== */
 var AC = window.AudioContext || window.webkitAudioContext;
+var silentEl = null;
+/* Sur iPhone, l'interrupteur silence coupe WebAudio mais laisse passer la
+   synthese vocale — d'ou un jeu muet alors que le bord parle. Lancer un
+   element <audio> en boucle lors du premier geste bascule la session audio
+   en categorie lecture, apres quoi WebAudio redevient audible.          */
+function unlockIOSAudio(){
+  if(silentEl) return;
+  try{
+    var a = document.createElement('audio');
+    a.src = 'data:audio/wav;base64,UklGRmQGAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YUAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    a.loop = true; a.preload = 'auto';
+    a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+    /* l'element doit etre DANS le document : detache, iOS ne bascule pas
+       la categorie de session et WebAudio reste muet                    */
+    a.style.cssText = 'position:absolute;width:0;height:0;opacity:0;pointer-events:none';
+    document.body.appendChild(a);
+    var pr = a.play();
+    if(pr && pr.catch) pr.catch(function(){});
+    silentEl = a;
+  }catch(e){}
+}
 var actx=null, master=null, engOsc=null, engGain=null, engLfo=null, engLfoGain=null;
 var soundOn=true, voiceOn=true, noiseBufs={};
 var CLK = 3579545/16;                       /* 223721 Hz : l'horloge du PSG */
@@ -648,11 +669,12 @@ function lfsrBuffer(shiftHz, white){
 }
 
 function audioBoot(){
+  unlockIOSAudio();
   if(actx || !AC) return;
   try{
     actx = new AC();
     if(actx.state === 'suspended' && actx.resume) actx.resume();
-    master = actx.createGain(); master.gain.value = 0.30; master.connect(actx.destination);
+    master = actx.createGain(); master.gain.value = 0.55; master.connect(actx.destination);
     engOsc = actx.createOscillator(); engOsc.type='square'; engOsc.frequency.value = tiTone(230);
     engGain = actx.createGain(); engGain.gain.value = 0;
     engLfo = actx.createOscillator(); engLfo.type='square'; engLfo.frequency.value = 13;
@@ -1025,6 +1047,10 @@ function onKey(e, down){
   else used = false;
   if(used) e.preventDefault();
 }
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && actx && actx.state === 'suspended' && actx.resume) actx.resume();
+  if(!document.hidden && silentEl && silentEl.paused){ var p=silentEl.play(); if(p&&p.catch) p.catch(function(){}); }
+});
 window.addEventListener('keydown', function(e){ if(!e.repeat) audioBoot(); onKey(e,true); }, {passive:false});
 window.addEventListener('keyup',   function(e){ onKey(e,false); }, {passive:false});
 
