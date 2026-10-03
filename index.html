@@ -131,6 +131,48 @@
   .key.on{background:var(--ti-lyellow);border-color:#9a8c56}
   .key:focus-visible{outline:2px solid #23262a;outline-offset:2px}
 
+  /* ---------- manette tactile : croix a gauche, blast a droite ---------- */
+  .pad{display:none}
+  .dpad{
+    display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:5px;
+  }
+  .dpad button, .blast{
+    -webkit-tap-highlight-color:transparent;touch-action:none;user-select:none;
+    font-family:var(--mono);font-weight:600;color:var(--ti-cyan);
+    background:linear-gradient(180deg,#2b2f35,#16181c);
+    border:1px solid #0a0b0d;border-top-color:#4a5058;
+    box-shadow:0 3px 0 #0a0b0d, 0 1px 0 rgba(255,255,255,.08) inset;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .dpad button{border-radius:9px;font-size:21px;line-height:1}
+  .dpad .up{grid-area:1/2}.dpad .left{grid-area:2/1}
+  .dpad .right{grid-area:2/3}.dpad .down{grid-area:3/2}
+  .dpad .hub{
+    grid-area:2/2;border-radius:6px;background:#101216;border:1px solid #0a0b0d;
+    box-shadow:none;display:flex;align-items:center;justify-content:center;
+    font-size:7px;letter-spacing:.1em;color:#4a5058;
+  }
+  .dpad button.on, .blast.on{
+    background:linear-gradient(180deg,var(--ti-cyan),#1f9aa3);color:#04110f;
+    box-shadow:0 1px 0 #0a0b0d;transform:translateY(2px);
+  }
+  .blast{
+    width:118px;height:118px;border-radius:50%;
+    font-family:var(--pixel);font-size:13px;letter-spacing:.06em;color:var(--ti-lyellow);
+    border-top-color:#5a4f32;
+  }
+  .padlabel{
+    font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+    text-align:center;margin-top:7px;
+  }
+  @media (pointer:coarse){
+    .pad{
+      display:flex;width:100%;max-width:640px;
+      align-items:center;justify-content:space-between;gap:16px;
+    }
+    .strip{display:none}          /* la manette remplace le cache clavier */
+  }
+
   .brief{width:100%;max-width:640px;display:flex;flex-direction:column;gap:12px}
   .brief h3{margin:0;font-family:var(--pixel);font-size:11px;letter-spacing:.1em;color:var(--ti-cyan)}
   .brief > p{margin:0;font-size:12px;line-height:1.7;color:var(--dim);max-width:62ch}
@@ -199,6 +241,23 @@
       </div>
     </div>
   </main>
+
+  <section class="pad" aria-label="Commandes tactiles">
+    <div>
+      <div class="dpad">
+        <button class="up"    data-act="lift" type="button" aria-label="Monter">&#9650;</button>
+        <button class="left"  data-act="slow" type="button" aria-label="Ralentir">&#9664;</button>
+        <div class="hub">LIFT</div>
+        <button class="right" data-act="fast" type="button" aria-label="Acc&eacute;l&eacute;rer">&#9654;</button>
+        <button class="down"  data-act="dive" type="button" aria-label="Descendre">&#9660;</button>
+      </div>
+      <div class="padlabel">Altitude &middot; Vitesse</div>
+    </div>
+    <div>
+      <button class="blast" data-act="fire" type="button" aria-label="Tirer">BLAST</button>
+      <div class="padlabel">Tir</div>
+    </div>
+  </section>
 
   <section class="strip" aria-label="Cache clavier Parsec, sert aussi de commandes tactiles">
     <div class="striphead"><b>PARSEC</b><span>Keyboard overlay</span></div>
@@ -969,7 +1028,7 @@ function onKey(e, down){
 window.addEventListener('keydown', function(e){ if(!e.repeat) audioBoot(); onKey(e,true); }, {passive:false});
 window.addEventListener('keyup',   function(e){ onKey(e,false); }, {passive:false});
 
-Array.prototype.forEach.call(document.querySelectorAll('.key'), function(btn){
+Array.prototype.forEach.call(document.querySelectorAll('[data-act]'), function(btn){
   var act = btn.getAttribute('data-act');
   function on(ev){
     ev.preventDefault(); audioBoot(); btn.classList.add('on');
