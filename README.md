@@ -3,7 +3,7 @@
 Remake jouable dans le navigateur de **Parsec** (Texas Instruments, 1982 — Jim Dramis
 et Paul Urbanus), le shoot'em up à défilement horizontal du TI-99/4A.
 
-▶ **[Jouer](https://xavierory76.github.io/parsec-recompiled/)**
+▶ **[Jouer](https://xorigin76.github.io/parsec-recompiled/)**
 
 Un seul fichier HTML autonome : pas de dépendance, pas de compilation, pas de serveur.
 Ouvrez-le, ou installez-le sur iPhone depuis Safari via « Sur l'écran d'accueil ».
