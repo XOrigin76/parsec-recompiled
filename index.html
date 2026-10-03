@@ -40,8 +40,9 @@
     max-width:760px;margin:0 auto;
     /* on respecte l'encoche et la barre d'accueil en mode plein ecran */
     padding-inline:max(16px, env(safe-area-inset-left,0px)) max(16px, env(safe-area-inset-right,0px));
-    padding-block:calc(22px + env(safe-area-inset-top,0px)) calc(44px + env(safe-area-inset-bottom,0px));
-    display:flex;flex-direction:column;gap:18px;align-items:center;
+    padding-block:calc(12px + env(safe-area-inset-top,0px)) calc(14px + env(safe-area-inset-bottom,0px));
+    display:flex;flex-direction:column;gap:14px;align-items:center;
+    min-height:100%;justify-content:center;
   }
   .cart{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
   .cart .eyebrow{font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--dim);font-weight:500}
@@ -192,7 +193,7 @@
 
   /* sur telephone : le canvas doit tenir sans faire defiler la page pour jouer */
   @media (max-width:560px){
-    canvas{ width:auto; height:auto; max-width:100%; max-height:46vh; max-height:46svh; }
+    canvas{ width:auto; height:auto; max-width:100%; max-height:56vh; max-height:56svh; }
     .screen{ justify-content:center }
   }
   /* au doigt, les touches du cache clavier doivent etre plus hautes */
@@ -212,12 +213,6 @@
 
 <div class="wrap">
 
-  <header class="cart">
-    <div class="eyebrow">Solid State Software &middot; Command Module</div>
-    <h1>PARSEC</h1>
-    <div class="strap">Lift 1 &middot; 6 vagues &middot; ceinture &middot; tunnel</div>
-  </header>
-
   <main class="console">
     <div class="bezel">
       <div class="screen">
@@ -225,15 +220,14 @@
         <div class="crt" aria-hidden="true"></div>
         <div class="overlay" id="overlay">
           <h2 id="ovTitle">PARSEC</h2>
-          <p id="ovText">Trois vagues de chasseurs alternent avec trois vagues de croiseurs, puis la ceinture d&rsquo;ast&eacute;ro&iuml;des et le tunnel de ravitaillement. Les chasseurs ne tirent pas&nbsp;: ils vous percutent. Les croiseurs, eux, tirent.</p>
+          <p id="ovText">Six vagues, la ceinture d&rsquo;ast&eacute;ro&iuml;des, le tunnel de ravitaillement.</p>
           <div class="stats" id="ovStats" hidden></div>
           <button class="go" id="ovBtn" type="button">PRESS FIRE</button>
-          <div class="hint" id="ovHint">Espace = tir &middot; &uarr;&darr; altitude &middot; &larr;&rarr; lift 1-3</div>
+          <div class="hint" id="ovHint">Tir &middot; Altitude &middot; Lift 1-3</div>
         </div>
       </div>
     </div>
     <div class="plate">
-      <div class="badge">TI-99/4A &nbsp;&middot;&nbsp; PHM 3112</div>
       <div class="toggles">
         <button class="tg" id="tgSound" type="button" aria-pressed="true">Son</button>
         <button class="tg" id="tgVoice" type="button" aria-pressed="true">Voix</button>
@@ -259,40 +253,7 @@
     </div>
   </section>
 
-  <section class="strip" aria-label="Cache clavier Parsec, sert aussi de commandes tactiles">
-    <div class="striphead"><b>PARSEC</b><span>Keyboard overlay</span></div>
-    <div class="keys">
-      <button class="key" data-act="lift" type="button"><kbd>&uarr;</kbd><em>Lift</em></button>
-      <button class="key" data-act="dive" type="button"><kbd>&darr;</kbd><em>Dive</em></button>
-      <button class="key" data-act="slow" type="button"><kbd>&larr;</kbd><em>Slow</em></button>
-      <button class="key" data-act="fast" type="button"><kbd>&rarr;</kbd><em>Fast</em></button>
-      <button class="key" data-act="fire" type="button"><kbd>FIRE</kbd><em>Blast</em></button>
-    </div>
-  </section>
 
-  <section class="brief">
-    <h3>ORDRE DE BATAILLE &mdash; RELEV&Eacute; SUR ENREGISTREMENT</h3>
-    <p>Cette s&eacute;quence n&rsquo;est pas devin&eacute;e&nbsp;: elle est mesur&eacute;e seconde par seconde sur un enregistrement de partie. Les messages du bord, d&eacute;coup&eacute;s en lettres noires dans la bande de sol, donnent les fronti&egrave;res exactes de chaque phase.</p>
-    <p>Le jeu n&rsquo;emploie que <strong>trois silhouettes d&rsquo;appareil</strong>, et non une par type&nbsp;: un petit chasseur, un gros fuselage partag&eacute; par les Urbites, Dramites, Bynites et LTF, et une soucoupe aplatie. Ce qui distingue un appareil d&rsquo;un autre, c&rsquo;est la <strong>couleur, tir&eacute;e au sort &agrave; chaque apparition</strong> &mdash; le m&ecirc;me fuselage passe du cyan au magenta, au rouge sombre ou au violet d&rsquo;une vague &agrave; l&rsquo;autre. Fiez-vous &agrave; la forme et &agrave; la taille, pas &agrave; la teinte.</p>
-    <p><strong>Les croiseurs changent d&rsquo;humeur.</strong> Les trois suivent le m&ecirc;me cycle&nbsp;: <span style="color:var(--ti-white)">blancs</span> &agrave; l&rsquo;arriv&eacute;e, ils passent au <span style="color:var(--ti-dblue)">bleu</span> au bout de deux secondes et acc&eacute;l&egrave;rent, puis au <span style="color:var(--ti-mred)">rouge</span> deux secondes plus tard&nbsp;: ils cessent alors de tirer et cherchent la collision. Un croiseur d&eacute;j&agrave; &eacute;nerv&eacute; qui sort par la gauche revient rouge &mdash; il ne se calme pas.</p>
-    <ol class="waves">
-      <li><span class="n">07s</span><span class="name fgt">ALIEN CRAFT ADVANCING!!!<span class="tag">Chasseurs</span><span class="desc">Les vagues de chasseurs ne sont jamais nomm&eacute;es &agrave; l&rsquo;&eacute;cran. Ils ne tirent pas&nbsp;: la menace est la collision.</span></span><span class="pts fgt">~15 s</span></li>
-      <li><span class="n">23s</span><span class="name cru">URBITE SHIPS ATTACKING!!!<span class="tag">Croiseurs</span><span class="desc">Trois appareils, annonc&eacute;s <em>un par un</em> &agrave; leur arriv&eacute;e. Ils tirent.</span></span><span class="pts cru">~21 s</span></li>
-      <li><span class="n">45s</span><span class="name fgt">ALIEN CRAFT ADVANCING!!!<span class="tag">Chasseurs</span><span class="desc">Deuxi&egrave;me vague de chasseurs.</span></span><span class="pts fgt">~17 s</span></li>
-      <li><span class="n">64s</span><span class="name cru">DRAMITE SHIPS ATTACKING!!!<span class="tag">Croiseurs</span><span class="desc">Deux appareils. Nomm&eacute;s d&rsquo;apr&egrave;s Jim Dramis.</span></span><span class="pts cru">~13 s</span></li>
-      <li><span class="n">77s</span><span class="name tu">REFUELING TUNNEL AHEAD<span class="desc"><strong>13 secondes de pr&eacute;avis</strong> avant que la bouche n&rsquo;arrive, puis FUEL STATION COMING UP, FUEL TANKS FULL&nbsp;!! et EXIT TUNNEL. Couloir mesur&eacute; &agrave; 22-27&nbsp;pixels.</span></span><span class="pts tu">~33 s</span></li>
-      <li><span class="n">111s</span><span class="name fgt">ALIEN CRAFT ADVANCING!!!<span class="tag">Chasseurs</span><span class="desc">Troisi&egrave;me vague, imm&eacute;diatement apr&egrave;s la sortie du tunnel.</span></span><span class="pts fgt">~19 s</span></li>
-      <li><span class="n">131s</span><span class="name cru">BYNITE SHIPS ATTACKING!!!<span class="tag">Croiseurs</span><span class="desc">Quatre appareils. Nomm&eacute;s d&rsquo;apr&egrave;s Don Bynum.</span></span><span class="pts cru">~19 s</span></li>
-      <li><span class="n">151s</span><span class="name as">CAUTION! ASTERIOD BELT!!<span class="desc">La faute de frappe est celle du jeu d&rsquo;origine. Le bord d&eacute;compte les secondes &agrave; voix haute&nbsp;; ensuite le sol change de couleur.</span></span><span class="pts as">~22 s</span></li>
-    </ol>
-    <p><strong style="color:var(--ti-mred)">Surchauffe&nbsp;:</strong> le canon chauffe &agrave; chaque tir et explose au rouge. <strong style="color:var(--ti-dyellow)">Carburant&nbsp;:</strong> il br&ucirc;le trois fois plus vite en LIFT 3. Vaisseau suppl&eacute;mentaire tous les 10&nbsp;000 points.</p>
-  </section>
-
-  <p class="colophon">
-    Remake d&rsquo;apr&egrave;s <em>Parsec</em> (Texas Instruments, 1982 &mdash; Jim Dramis &amp; Paul Urbanus). Sont relev&eacute;s au pixel sur des captures d&rsquo;&eacute;poque&nbsp;: le vaisseau joueur (16&times;10), le chasseur (14&times;8), le croiseur (16&times;13), la tour au sol (22&times;16), le rayon laser en pointill&eacute;, le nuage d&rsquo;explosion, la palette, la disposition du bandeau et le profil du tunnel. La police 5&times;7 et les bruitages reproduisent le g&eacute;n&eacute;rateur SN76489 du TI-99/4A (voies carr&eacute;es &agrave; diviseur 10 bits, bruit &agrave; registre &agrave; d&eacute;calage 15 bits). Jeu non affili&eacute; &agrave; Texas Instruments.
-  </p>
-
-</div>
 
 <script>
 (function(){
